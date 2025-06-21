@@ -1,1 +1,50 @@
-<h1>Welcome</h1><p>Patricia & Mark — June 8, 2026</p>
+<style>
+  .peg-wrapper {
+    width: 200px;
+    height: 200px;
+    margin: 2rem auto;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f3ebe4;
+  }
+  .peg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .countdown {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    color: #7e6d65;
+  }
+</style>
+
+<div class="peg-wrapper">
+  <img class="peg-img" src="resources/cover.jpg" alt="Mark and Patricia" />
+</div>
+<h1>Welcome</h1>
+<p>Patricia & Mark — June 8, 2026</p>
+
+<div id="countdown" class="countdown">Loading countdown...</div>
+
+<script>
+  const countdownElement = document.getElementById('countdown');
+  const weddingDate = new Date('2026-06-08T00:00:00');
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = weddingDate - now;
+    if (diff <= 0) {
+      countdownElement.textContent = "It's our big day! 💖";
+      return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    countdownElement.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs to go 💍`;
+  }
+
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+</script>

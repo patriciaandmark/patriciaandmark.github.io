@@ -32,7 +32,12 @@
       color: #c9bab0;
     }
     #page-content {
+      opacity: 0;
+      transition: opacity 0.5s ease;
       padding: 2rem;
+    }
+    #page-content.loaded {
+      opacity: 1;
     }
   </style>
 </head>
@@ -49,18 +54,20 @@
     <!-- Dynamic content will load here -->
   </main>
 
-  <footer>Made with love by Mark & Patricia</footer>
+  <footer>Made with love by Patricia & Mark</footer>
 
   <script>
     function loadPage(page) {
+      const content = document.getElementById('page-content');
+      content.classList.remove('loaded');
       fetch(page)
         .then(response => response.text())
         .then(html => {
-          document.getElementById('page-content').innerHTML = html;
+          content.innerHTML = html;
+          setTimeout(() => content.classList.add('loaded'), 50);
           window.scrollTo(0, 0);
         });
-    }
-
+    }       
     window.onload = () => loadPage('welcome.html');
   </script>
 </body>
