@@ -1,0 +1,23 @@
+<h2>RSVP</h2>
+<form name="submit-to-google-sheet">
+  <input name="Name" type="text" placeholder="Your name" required><br>
+  <input name="Email" type="email" placeholder="Your email" required><br>
+  <p>Will you be attending?</p>
+  <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label><br>
+  <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label><br>
+  <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label><br>
+  <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label><br>
+  <button type="submit">Send RSVP</button>
+</form>
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
+  const form = document.forms['submit-to-google-sheet'];
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => alert("Thank you for your RSVP!"))
+        .catch(error => console.error('Error!', error.message));
+    });
+  }
+</script>

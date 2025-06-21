@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +7,6 @@
   <title>Mark & Patricia | 06.08.26</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
     body {
       font-family: 'Inter', sans-serif;
       background: #f9f9f9;
@@ -29,203 +27,41 @@
       text-decoration: none;
       color: #7e6d65;
       font-weight: 600;
-      font-size: 0.95rem;
     }
     nav a:hover {
       color: #c9bab0;
     }
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-      color: #2c2c2c;
-    }
-    header {
-      background: #fff;
-      padding: 2rem 1rem 1rem;
-    }
-    header img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-    }
-    main {
-      padding: 2rem 1rem;
-    }
-    h1 {
-      font-size: 2.75rem;
-      margin-bottom: 0.25rem;
-    }
-    h2 {
-      font-size: 1.75rem;
-      font-weight: 400;
-      margin-top: 0;
-      color: #5a5a5a;
-    }
-    p {
-      margin: 1.5rem auto;
-      max-width: 600px;
-      line-height: 1.6;
-    }
-    .date {
-      font-size: 1.25rem;
-      color: #888;
-    }
-    .countdown {
-      font-size: 1.25rem;
-      margin-top: 1rem;
-      color: #444;
-    }
-    section {
-      margin-top: 3rem;
-    }
-    iframe {
-      width: 90%;
-      height: 300px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 1rem;
-    }
-    .gallery img {
-      width: 90%;
-      max-width: 500px;
-      border-radius: 12px;
-      margin: 1rem 0;
-    }
-    form {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    input, textarea, button {
-      margin: 0.5rem 0;
-      padding: 0.75rem;
-      width: 90%;
-      max-width: 400px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      background-color: #c9bab0;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-    }
-    button:hover {
-      background-color: #b3a69c;
-    }
-    .faq-item {
-      margin: 1.5rem auto;
-      max-width: 600px;
-      text-align: left;
-    }
-    .faq-item h4 {
-      margin-bottom: 0.25rem;
-      color: #444;
-    }
-    footer {
-      margin-top: 4rem;
-      font-size: 0.9rem;
-      color: #aaa;
-      padding: 1rem;
+    #page-content {
+      padding: 2rem;
     }
   </style>
 </head>
 <body>
   <nav>
-    <a href="#our-story">Our Story</a>
-    <a href="#location">Location</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#rsvp">RSVP</a>
-    <a href="#faq">FAQs</a>
+    <a href="#" onclick="loadPage('welcome.html')">Welcome</a>
+    <a href="#" onclick="loadPage('our-story.html')">Our Story</a>
+    <a href="#" onclick="loadPage('gallery.html')">Gallery</a>
+    <a href="#" onclick="loadPage('rsvp.html')">RSVP</a>
+    <a href="#" onclick="loadPage('faq.html')">FAQs</a>
   </nav>
-  <header>
-    <img src="492335790_10230578118098588_1581402733294940625_n.jpg" alt="Mark and Patricia smiling together on a pink background">
-  </header>
-  <main>
-    <h1>Mark & Patricia</h1>
-    <h2>We're getting married!</h2>
-    <p class="date">June 8, 2026</p>
-    <div class="countdown" id="countdown"></div>
 
-    <section id="our-story">
-      <h3>Our Story</h3>
-      <p>We met in high school and have been each other's first and forever love ever since. From classmates to soulmates, we've grown together through every chapter. Mark proposed in the quiet of Patricia's car — just us, just right. We love doing everything and nothing, as long as we're together. 💕</p>
-    </section>
-
-    <section id="location">
-      <h3>Location</h3>
-      <p>McKinley Hill, Taguig</p>
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1930.9203058695036!2d121.05124488821628!3d14.537011848768065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c91b7abf40d7%3A0xdac1d5dfc1f23cd9!2sMcKinley%20Hill%2C%20Taguig%2C%20Metro%20Manila!5e0!3m2!1sen!2sph!4v1718995743551!5m2!1sen!2sph"
-        allowfullscreen=""
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </section>
-
-    <section id="gallery" class="gallery">
-      <h3>Venue & Vibes</h3>
-      <img src="503561976_10231090605270447_6009910642194341332_n.jpg" alt="Mark and Patricia smiling outdoors with autumn trees behind them">
-    </section>
-
-    <section id="rsvp">
-      <h3>RSVP</h3>
-      <form name="submit-to-google-sheet">
-        <input name="Name" type="text" placeholder="Your name" required>
-        <input name="Email" type="email" placeholder="Your email" required>
-        <textarea name="Message" rows="4" placeholder="Message or number of guests..." required></textarea>
-        <button type="submit">Send RSVP</button>
-      </form>
-    </section>
-
-    <section id="faq" class="faq">
-      <h3>FAQs</h3>
-      <div class="faq-item">
-        <h4>What should I wear?</h4>
-        <p>Please dress in semi-formal attire. Neutrals are always welcome 🤍</p>
-      </div>
-      <div class="faq-item">
-        <h4>Can I bring a plus one?</h4>
-        <p>If your invitation says "+1", we'd love to welcome your guest. Otherwise, we kindly request no additions 🫶</p>
-      </div>
-      <div class="faq-item">
-        <h4>Is parking available?</h4>
-        <p>Yes! The venue has ample parking. We'll update the exact directions closer to the date.</p>
-      </div>
-    </section>
+  <main id="page-content">
+    <!-- Dynamic content will load here -->
   </main>
+
   <footer>Made with love by Mark & Patricia</footer>
 
   <script>
-    const countdown = document.getElementById('countdown');
-    const weddingDate = new Date('2026-06-08T00:00:00');
-
-    function updateCountdown() {
-      const now = new Date();
-      const diff = weddingDate - now;
-      if (diff <= 0) {
-        countdown.textContent = "It's our big day! 💖";
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      countdown.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs to go 💍`;
+    function loadPage(page) {
+      fetch(page)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('page-content').innerHTML = html;
+          window.scrollTo(0, 0);
+        });
     }
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
 
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzIQrBrBdJ6nRc2Lqmz8iy2HWSeK7pIg9bqSo6uzz8Fd52G41ytHW9PpaDYB8uceC08/exec';
-    const form = document.forms['submit-to-google-sheet'];
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => alert("Thank you for your RSVP!"))
-        .catch(error => console.error('Error!', error.message));
-    });
+    window.onload = () => loadPage('welcome.html');
   </script>
 </body>
 </html>
