@@ -23,23 +23,27 @@
 <div id="countdown" class="countdown">Loading countdown...</div>
 
 <script>
-  const countdownElement = document.getElementById('countdown');
-  const weddingDate = new Date('2026-06-08T00:00:00');
+  (function() {
+    const countdownElement = document.getElementById('countdown');
+    if (!countdownElement) return;
 
-  function updateCountdown() {
-    const now = new Date();
-    const diff = weddingDate - now;
-    if (diff <= 0) {
-      countdownElement.textContent = "It's our big day! 💖";
-      return;
+    const weddingDate = new Date('2026-06-08T00:00:00');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = weddingDate - now;
+      if (diff <= 0) {
+        countdownElement.textContent = "It's our big day! 💖";
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      countdownElement.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs to go 💍`;
     }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-    countdownElement.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs to go 💍`;
-  }
 
-  setInterval(updateCountdown, 1000);
-  updateCountdown();
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  })();
 </script>
