@@ -3,85 +3,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Patricia & Mark | 06.08.26</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome | Patricia & Mark</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f9f9f9;
-      color: #333;
       margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f9f7f5;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
       text-align: center;
     }
-    nav {
-      background: #fff;
-      padding: 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #5e524b;
+      margin-bottom: 1rem;
     }
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #7e6d65;
-      font-weight: 600;
+    input {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      width: 250px;
     }
-    nav a:hover {
-      color: #c9bab0;
+    button {
+      background: #c9bab0;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    #page-content {
-      padding: 2rem;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+    button:hover {
+      background: #b3a69c;
     }
-    #page-content.loaded {
-      opacity: 1;
+    #error {
+      color: #a55;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <nav>
-    <a href="#" onclick="loadPage('welcome.html')">Welcome</a>
-    <a href="#" onclick="loadPage('our-story.html')">Our Story</a>
-    <a href="#" onclick="loadPage('gallery.html')">Gallery</a>
-    <a href="#" onclick="loadPage('rsvp.html')">RSVP</a>
-    <a href="#" onclick="loadPage('faq.html')">FAQs</a>
-  </nav>
-
-  <main id="page-content"></main>
-
-  <footer>Made with love by Patricia & Mark</footer>
+  <h2>Welcome to Our Wedding Site 💕</h2>
+  <input type="password" id="pw" placeholder="Enter passcode" />
+  <button onclick="checkPW()">Enter</button>
+  <p id="error"></p>
 
   <script>
-    function loadPage(page) {
-      const content = document.getElementById('page-content');
-      content.classList.remove('loaded');
-      fetch(page)
-        .then(response => response.text())
-        .then(html => {
-          content.innerHTML = html;
-
-          // Run any scripts manually
-          const scripts = content.querySelectorAll("script");
-          scripts.forEach(script => {
-            const newScript = document.createElement("script");
-            if (script.src) {
-              newScript.src = script.src;
-            } else {
-              newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-            script.remove();
-          });
-
-          setTimeout(() => content.classList.add('loaded'), 50);
-          window.scrollTo(0, 0);
-        });
+    function checkPW() {
+      const password = document.getElementById('pw').value;
+      const correct = '060826';
+      if (password === correct) {
+        window.location.href = 'index.html';
+      } else {
+        document.getElementById('error').textContent = 'Incorrect password 😢';
+      }
     }
-
-    window.onload = () => loadPage('welcome.html');
   </script>
 </body>
 </html>
