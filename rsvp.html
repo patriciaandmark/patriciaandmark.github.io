@@ -1,16 +1,75 @@
-
 <h2>RSVP</h2>
-<form name="submit-to-google-sheet">
-  <input name="Name" type="text" placeholder="Your name" required><br>
-  <input name="Email" type="email" placeholder="Your email" required><br>
-  <p>Will you be attending?</p>
-  <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label><br>
-  <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label><br>
-  <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label><br>
-  <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label><br>
-  <button type="submit">Send RSVP</button>
-</form>
-<script> 
+<style>
+  .rsvp-form {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 2rem auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    text-align: left;
+  }
+  .rsvp-form label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #5e524b;
+  }
+  .rsvp-form input[type="text"],
+  .rsvp-form input[type="email"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: 'Inter', sans-serif;
+  }
+  .rsvp-form .options {
+    margin-top: 1rem;
+  }
+  .rsvp-form .options label {
+    font-weight: normal;
+    display: block;
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+  }
+  .rsvp-form button {
+    margin-top: 1.5rem;
+    width: 100%;
+    background-color: #c9bab0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .rsvp-form button:hover {
+    background-color: #b3a69c;
+  }
+</style>
+<div class="rsvp-form">
+  <form name="submit-to-google-sheet">
+    <label for="name">Name</label>
+    <input name="Name" type="text" id="name" placeholder="Your full name" required>
+
+    <label for="email">Email</label>
+    <input name="Email" type="email" id="email" placeholder="you@example.com" required>
+
+    <label>Will you be attending?</label>
+    <div class="options">
+      <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label>
+      <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label>
+      <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label>
+      <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label>
+    </div>
+
+    <button type="submit">Send RSVP</button>
+  </form>
+</div>
+
+<script>
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
   const form = document.forms['submit-to-google-sheet'];
   if (form) {
