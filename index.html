@@ -32,9 +32,9 @@
       color: #c9bab0;
     }
     #page-content {
+      padding: 2rem;
       opacity: 0;
       transition: opacity 0.5s ease;
-      padding: 2rem;
     }
     #page-content.loaded {
       opacity: 1;
@@ -50,11 +50,9 @@
     <a href="#" onclick="loadPage('faq.html')">FAQs</a>
   </nav>
 
-  <main id="page-content">
-    <!-- Dynamic content will load here -->
-  </main>
+  <main id="page-content"></main>
 
-  <footer>Made with love by Patricia & Mark</footer>
+  <footer>Made with love by Mark & Patricia</footer>
 
   <script>
     function loadPage(page) {
@@ -64,10 +62,25 @@
         .then(response => response.text())
         .then(html => {
           content.innerHTML = html;
+
+          // Run any scripts manually
+          const scripts = content.querySelectorAll("script");
+          scripts.forEach(script => {
+            const newScript = document.createElement("script");
+            if (script.src) {
+              newScript.src = script.src;
+            } else {
+              newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+            script.remove();
+          });
+
           setTimeout(() => content.classList.add('loaded'), 50);
           window.scrollTo(0, 0);
         });
-    }       
+    }
+
     window.onload = () => loadPage('welcome.html');
   </script>
 </body>
