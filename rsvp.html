@@ -312,7 +312,7 @@
     class="rsvp-form"
     data-owner-names="Patricia Example|Mark Example"
     data-sheet-id="1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw"
-    data-sheet-gid="0"
+    data-sheet-name="GuestList"
   >
     <form name="submit-to-google-sheet" autocomplete="off">
       <div class="guest-search">
@@ -373,10 +373,11 @@
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
     const formContainer = document.querySelector('.rsvp-form');
 
+    // --- FIX #1: no default gid; prefer sheetName
     function getSheetConfig() {
       const defaults = {
         sheetId: '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw',
-        gid: '0',
+        gid: null,          // <--- was "0"; now null so it won't be used by default
         sheetName: '',
         query: '',
       };
@@ -386,6 +387,7 @@
           defaults.sheetId = formContainer.dataset.sheetId;
         }
         if (formContainer.dataset.sheetGid) {
+          // only set gid if explicitly provided in markup
           defaults.gid = formContainer.dataset.sheetGid;
         }
         if (formContainer.dataset.sheetName) {
@@ -398,39 +400,32 @@
 
       if (window.RSVP_SHEET_CONFIG && typeof window.RSVP_SHEET_CONFIG === 'object') {
         const overrides = window.RSVP_SHEET_CONFIG;
-        if (overrides.sheetId) {
-          defaults.sheetId = overrides.sheetId;
+        if (overrides.sheetId) defaults.sheetId = overrides.sheetId;
+        // handle 0 correctly but still stringify later
+        if (overrides.gid !== undefined && overrides.gid !== null && overrides.gid !== '') {
+          defaults.gid = overrides.gid;
         }
-        if (overrides.gid || overrides.gid === 0) {
-          defaults.gid = String(overrides.gid);
-        }
-        if (overrides.sheetName) {
-          defaults.sheetName = overrides.sheetName;
-        }
-        if (typeof overrides.query === 'string') {
-          defaults.query = overrides.query;
-        }
+        if (overrides.sheetName) defaults.sheetName = overrides.sheetName;
+        if (typeof overrides.query === 'string') defaults.query = overrides.query;
       }
 
       return defaults;
     }
 
+    // --- FIX #2: only include gid if sheetName is NOT present
     function buildSheetCsvUrl(config) {
-      if (!config || !config.sheetId) {
-        return '';
-      }
+      if (!config || !config.sheetId) return '';
 
       const base = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq`;
       const params = new URLSearchParams({ tqx: 'out:csv' });
 
-      if (config.query) {
-        params.set('tq', config.query);
-      }
+      if (config.query) params.set('tq', config.query);
+
       if (config.sheetName) {
         params.set('sheet', config.sheetName);
-      }
-      if (config.gid || config.gid === 0) {
-        params.set('gid', config.gid);
+        // IMPORTANT: do NOT also set gid when sheetName is provided
+      } else if (config.gid !== null && config.gid !== undefined && config.gid !== '') {
+        params.set('gid', String(config.gid));
       }
 
       return `${base}?${params.toString()}`;
@@ -438,6 +433,7 @@
 
     const SHEET_CONFIG = getSheetConfig();
     const RSVP_CSV_URL = buildSheetCsvUrl(SHEET_CONFIG);
+    console.log('RSVP_CSV_URL:', RSVP_CSV_URL); // sanity check
 
     const form = document.forms['submit-to-google-sheet'];
     const searchInput = document.getElementById('guest-search');
@@ -462,56 +458,35 @@
     let familySummaries = {};
     let currentGuest = null;
 
-    function normalize(value) {
-      return String(value || '').trim();
-    }
-
-    function normalizeName(value) {
-      return normalize(value).toLowerCase();
-    }
+    function normalize(value) { return String(value || '').trim(); }
+    function normalizeName(value) { return normalize(value).toLowerCase(); }
 
     function getOwnerOverrideNames() {
       const owners = new Set();
       if (formContainer && formContainer.dataset.ownerNames) {
         formContainer.dataset.ownerNames.split('|').forEach((name) => {
-          const normalized = normalizeName(name);
-          if (normalized) {
-            owners.add(normalized);
-          }
+          const n = normalizeName(name);
+          if (n) owners.add(n);
         });
       }
-
       if (Array.isArray(window.RSVP_OWNER_OVERRIDES)) {
         window.RSVP_OWNER_OVERRIDES.forEach((name) => {
-          const normalized = normalizeName(name);
-          if (normalized) {
-            owners.add(normalized);
-          }
+          const n = normalizeName(name);
+          if (n) owners.add(n);
         });
       }
-
       return Array.from(owners);
     }
 
     const OWNER_OVERRIDES = new Set(getOwnerOverrideNames());
-
-    function isOwnerName(name) {
-      if (!name) {
-        return false;
-      }
-      return OWNER_OVERRIDES.has(normalizeName(name));
-    }
+    const isOwnerName = (name) => name && OWNER_OVERRIDES.has(normalizeName(name));
 
     function getFamilySummaryForGuest(guest) {
-      if (!guest) {
-        return null;
-      }
+      if (!guest) return null;
 
       const key = normalizeName(guest.FamilyID || guest.FamilyName || '');
       const existing = familySummaries[key];
-      if (existing) {
-        return existing;
-      }
+      if (existing) return existing;
 
       const fallbackMembers = guestEntries
         .filter((entry) => normalizeName(entry.FamilyID) === normalizeName(guest.FamilyID))
@@ -535,71 +510,41 @@
       };
     }
 
+    // unchanged CSV parser
     function parseCSV(text) {
-      if (!text) {
-        return [];
-      }
-
+      if (!text) return [];
       const rows = [];
       let currentValue = '';
       let currentRow = [];
       let insideQuotes = false;
 
-      for (let index = 0; index < text.length; index += 1) {
-        const char = text[index];
-
-        if (char === '"') {
-          const nextChar = text[index + 1];
-          if (insideQuotes && nextChar === '"') {
-            currentValue += '"';
-            index += 1;
-          } else {
-            insideQuotes = !insideQuotes;
-          }
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        if (ch === '"') {
+          const next = text[i + 1];
+          if (insideQuotes && next === '"') { currentValue += '"'; i += 1; }
+          else { insideQuotes = !insideQuotes; }
           continue;
         }
-
-        if (char === ',' && !insideQuotes) {
-          currentRow.push(currentValue);
-          currentValue = '';
-          continue;
+        if (ch === ',' && !insideQuotes) { currentRow.push(currentValue); currentValue = ''; continue; }
+        if ((ch === '\n' || ch === '\r') && !insideQuotes) {
+          if (ch === '\r' && text[i + 1] === '\n') i += 1;
+          currentRow.push(currentValue); rows.push(currentRow); currentRow = []; currentValue = ''; continue;
         }
-
-        if ((char === '\n' || char === '\r') && !insideQuotes) {
-          if (char === '\r' && text[index + 1] === '\n') {
-            index += 1;
-          }
-          currentRow.push(currentValue);
-          rows.push(currentRow);
-          currentRow = [];
-          currentValue = '';
-          continue;
-        }
-
-        currentValue += char;
+        currentValue += ch;
       }
-
-      if (currentValue.length || currentRow.length) {
-        currentRow.push(currentValue);
-        rows.push(currentRow);
-      }
+      if (currentValue.length || currentRow.length) { currentRow.push(currentValue); rows.push(currentRow); }
 
       const cleanedRows = rows
-        .map((row) => row.map((value) => String(value || '').trim()))
-        .filter((row) => row.some((value) => value.length));
+        .map((row) => row.map((v) => String(v || '').trim()))
+        .filter((row) => row.some((v) => v.length));
+      if (!cleanedRows.length) return [];
 
-      if (!cleanedRows.length) {
-        return [];
-      }
-
-      const headers = cleanedRows[0].map((header) => header.replace(/^\uFEFF/, ''));
-
-      return cleanedRows.slice(1).map((row) => {
-        return headers.reduce((entry, header, index) => {
-          entry[header] = row[index] ?? '';
-          return entry;
-        }, {});
-      });
+      const headers = cleanedRows[0].map((h) => h.replace(/^\uFEFF/, ''));
+      return cleanedRows.slice(1).map((row) => headers.reduce((acc, h, idx) => {
+        acc[h] = row[idx] ?? '';
+        return acc;
+      }, {}));
     }
 
     function buildFamilySummaries(entries) {
@@ -620,13 +565,11 @@
             members: [],
           };
         }
-
         const family = families[key];
         const memberName = normalize(entry.MemberName);
         if (memberName && !family.members.includes(memberName)) {
           family.members.push(memberName);
         }
-
         if ((entry.Role || '').toLowerCase() === 'lead') {
           family.leadName = memberName || family.leadName;
           family.status = entry.RSVPStatus || family.status;
@@ -635,16 +578,13 @@
           family.notes = entry.Notes || family.notes;
           family.contactEmail = entry.ContactEmail || family.contactEmail;
         }
-
         return families;
       }, {});
     }
 
     function renderStatusFromFamilies(families) {
       const container = document.getElementById('rsvp-status');
-      if (!container) {
-        return;
-      }
+      if (!container) return;
 
       container.innerHTML = '<h3>Family RSVP Status</h3>';
 
@@ -655,21 +595,15 @@
         return;
       }
 
-      const totals = families.reduce(
-        (summary, family) => {
-          summary.invited += Number(family.invited || 0);
-          summary.attending += Number(family.attending || 0);
-          if ((family.status || '').toLowerCase() === 'confirmed') {
-            summary.confirmed += 1;
-          } else if ((family.status || '').toLowerCase() === 'declined') {
-            summary.declined += 1;
-          } else {
-            summary.pending += 1;
-          }
-          return summary;
-        },
-        { invited: 0, attending: 0, confirmed: 0, pending: 0, declined: 0 }
-      );
+      const totals = families.reduce((sum, f) => {
+        sum.invited += Number(f.invited || 0);
+        sum.attending += Number(f.attending || 0);
+        const s = (f.status || '').toLowerCase();
+        if (s === 'confirmed') sum.confirmed += 1;
+        else if (s === 'declined') sum.declined += 1;
+        else sum.pending += 1;
+        return sum;
+      }, { invited: 0, attending: 0, confirmed: 0, pending: 0, declined: 0 });
 
       const summaryBlock = document.createElement('div');
       summaryBlock.className = 'status-summary';
@@ -698,28 +632,25 @@
       `;
 
       const tbody = table.querySelector('tbody');
-
       families
         .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach((family) => {
+        .forEach((f) => {
           const row = document.createElement('tr');
-          const status = family.status || 'Pending';
-          const members = family.members.filter(Boolean).join(', ');
-
+          const status = f.status || 'Pending';
+          const members = f.members.filter(Boolean).join(', ');
           row.innerHTML = `
             <td>
-              <strong>${family.name}</strong>
+              <strong>${f.name}</strong>
               <div class="status-members">${members}</div>
             </td>
-            <td>${family.leadName || '—'}</td>
-            <td>${family.invited || 0}</td>
-            <td>${family.attending || 0}</td>
+            <td>${f.leadName || '—'}</td>
+            <td>${f.invited || 0}</td>
+            <td>${f.attending || 0}</td>
             <td>
               <span class="status-chip" data-status="${status}">${status}</span>
-              ${family.updated ? `<div class="status-updated">Updated ${family.updated}</div>` : ''}
+              ${f.updated ? `<div class="status-updated">Updated ${f.updated}</div>` : ''}
             </td>
           `;
-
           tbody.appendChild(row);
         });
 
@@ -727,47 +658,28 @@
     }
 
     function setEligibility(status, message) {
-      if (!eligibilityMessage) {
-        return;
-      }
+      if (!eligibilityMessage) return;
       eligibilityMessage.dataset.status = status;
       eligibilityMessage.textContent = message;
     }
 
     function setFormEnabled(enabled) {
-      if (!formDetails) {
-        return;
-      }
+      if (!formDetails) return;
 
-      [emailField, submitButton].forEach((field) => {
-        if (field) {
-          field.disabled = !enabled;
-        }
+      [emailField, submitButton].forEach((f) => { if (f) f.disabled = !enabled; });
+      if (emailField) emailField.required = enabled;
+
+      formDetails.querySelectorAll('input[type="radio"][name="Attendance"]').forEach((r) => {
+        r.disabled = !enabled;
+        if (!enabled) r.checked = false;
       });
 
-      if (emailField) {
-        emailField.required = enabled;
-      }
-
-      const radios = formDetails.querySelectorAll('input[type="radio"][name="Attendance"]');
-      radios.forEach((radio) => {
-        radio.disabled = !enabled;
-        if (!enabled) {
-          radio.checked = false;
-        }
+      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+        c.disabled = !enabled;
+        if (!enabled) c.checked = false;
       });
 
-      const checkboxes = attendanceCheckboxes.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach((checkbox) => {
-        checkbox.disabled = !enabled;
-        if (!enabled) {
-          checkbox.checked = false;
-        }
-      });
-
-      if (!enabled) {
-        attendingNamesField.value = '';
-      }
+      if (!enabled) attendingNamesField.value = '';
     }
 
     function showFamilySummary(family) {
@@ -798,33 +710,23 @@
       formDetails.classList.add('is-hidden');
       setFormEnabled(false);
     }
-
-    function hideSubmissionLock() {
-      submissionLock.classList.add('is-hidden');
-    }
+    function hideSubmissionLock() { submissionLock.classList.add('is-hidden'); }
 
     function renderAttendanceSelector(family, selected = []) {
       attendanceCheckboxes.innerHTML = '';
-      if (!family) {
-        return;
-      }
+      if (!family) return;
 
       const members = family.members.filter(Boolean);
-      if (!members.length && currentGuest) {
-        members.push(currentGuest.MemberName);
-      }
+      if (!members.length && currentGuest) members.push(currentGuest.MemberName);
 
-      const normalizedSelected = new Set(selected.map((name) => normalizeName(name)));
-
+      const normalizedSelected = new Set(selected.map((n) => normalizeName(n)));
       members.forEach((member) => {
         const option = document.createElement('label');
         option.className = 'attendee-option';
-
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = member;
         checkbox.checked = normalizedSelected.size ? normalizedSelected.has(normalizeName(member)) : true;
-
         option.appendChild(checkbox);
         option.appendChild(document.createTextNode(member));
         attendanceCheckboxes.appendChild(option);
@@ -833,57 +735,40 @@
       refreshAttendingNames();
       setTimeout(() => {
         const notAttending = formDetails.querySelector('input[name="Attendance"][value="Not Attending"]');
-        if (notAttending && notAttending.checked) {
-          toggleAttendanceCheckboxes(true);
-        }
+        if (notAttending && notAttending.checked) toggleAttendanceCheckboxes(true);
       }, 0);
     }
 
     function refreshAttendingNames() {
       const selected = Array.from(attendanceCheckboxes.querySelectorAll('input[type="checkbox"]:checked'))
-        .map((checkbox) => normalize(checkbox.value))
-        .filter(Boolean);
+        .map((c) => normalize(c.value)).filter(Boolean);
       attendingNamesField.value = selected.join(', ');
     }
 
     function toggleAttendanceCheckboxes(disable) {
-      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-        checkbox.disabled = disable;
-        if (disable) {
-          checkbox.checked = false;
-        } else if (!attendingNamesField.value) {
-          checkbox.checked = true;
-        }
+      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+        c.disabled = disable;
+        if (disable) c.checked = false;
+        else if (!attendingNamesField.value) c.checked = true;
       });
-
-      if (disable) {
-        attendingNamesField.value = '';
-      } else {
-        refreshAttendingNames();
-      }
+      if (disable) attendingNamesField.value = ''; else refreshAttendingNames();
     }
 
     function isFamilyLocked(family) {
-      if (!family) {
-        return false;
-      }
+      if (!family) return false;
       const status = normalizeName(family.status);
       return Boolean(status && status !== 'pending');
     }
 
     function findGuestByName(name) {
-      if (!name) {
-        return null;
-      }
-      const normalized = normalizeName(name);
-      return guestEntries.find((entry) => normalizeName(entry.MemberName) === normalized) || null;
+      if (!name) return null;
+      const n = normalizeName(name);
+      return guestEntries.find((e) => normalizeName(e.MemberName) === n) || null;
     }
 
     function findFamilyLead(familyId) {
-      const normalizedId = normalizeName(familyId);
-      return guestEntries.find((entry) => {
-        return normalizeName(entry.FamilyID) === normalizedId && normalizeName(entry.Role) === 'lead';
-      });
+      const id = normalizeName(familyId);
+      return guestEntries.find((e) => normalizeName(e.FamilyID) === id && normalizeName(e.Role) === 'lead');
     }
 
     function handleSelection(nameFromInput) {
@@ -891,11 +776,8 @@
       const ownerOverride = isOwnerName(rawName);
 
       if (!guestEntries.length) {
-        if (ownerOverride) {
-          setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
-        } else {
-          setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
-        }
+        if (ownerOverride) setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
+        else setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
         return;
       }
 
@@ -903,9 +785,7 @@
         currentGuest = null;
         nameField.value = '';
         familyIdField.value = '';
-        if (leadNameField) {
-          leadNameField.value = '';
-        }
+        if (leadNameField) leadNameField.value = '';
         attendingNamesField.value = '';
         setEligibility('checking', 'Start typing your name to find your invitation.');
         familySummary.classList.add('is-hidden');
@@ -920,9 +800,7 @@
         familySummary.classList.add('is-hidden');
         formDetails.classList.add('is-hidden');
         hideSubmissionLock();
-        if (leadNameField) {
-          leadNameField.value = '';
-        }
+        if (leadNameField) leadNameField.value = '';
         return;
       }
 
@@ -931,9 +809,7 @@
         familySummary.classList.add('is-hidden');
         formDetails.classList.add('is-hidden');
         hideSubmissionLock();
-        if (leadNameField) {
-          leadNameField.value = '';
-        }
+        if (leadNameField) leadNameField.value = '';
         return;
       }
 
@@ -941,9 +817,7 @@
       currentGuest = { ...guest, __owner: ownerOverride };
       nameField.value = guest.MemberName || rawName;
       familyIdField.value = guest.FamilyID || '';
-      if (leadNameField) {
-        leadNameField.value = '';
-      }
+      if (leadNameField) leadNameField.value = '';
 
       showFamilySummary(family);
       hideSubmissionLock();
@@ -951,9 +825,7 @@
       const isLead = ownerOverride || normalizeName(guest.Role) === 'lead';
       const familyLead = isLead ? guest : findFamilyLead(guest.FamilyID);
       const leadName = familyLead?.MemberName || familyLead?.LeadName || guest.LeadName || '';
-      if (leadNameField) {
-        leadNameField.value = leadName || '';
-      }
+      if (leadNameField) leadNameField.value = leadName || '';
 
       if (!isLead) {
         setEligibility('info', `Hi ${guest.MemberName}! Please ask ${leadName || 'your family lead'} to submit the RSVP for your family.`);
@@ -981,21 +853,14 @@
       setEligibility('ok', welcomeMessage);
 
       formDetails.classList.remove('is-hidden');
-      const radios = formDetails.querySelectorAll('input[name="Attendance"]');
-      radios.forEach((radio) => {
-        radio.checked = false;
-      });
-      if (emailField) {
-        emailField.value = '';
-      }
+      formDetails.querySelectorAll('input[name="Attendance"]').forEach((r) => { r.checked = false; });
+      if (emailField) emailField.value = '';
       setFormEnabled(true);
       renderAttendanceSelector(family);
     }
 
     function renderSearchMatches(query) {
-      if (!searchResults) {
-        return;
-      }
+      if (!searchResults) return;
 
       const trimmed = normalize(query);
       if (!trimmed || !guestEntries.length) {
@@ -1005,7 +870,7 @@
       }
 
       const matches = guestEntries
-        .filter((entry) => normalizeName(entry.MemberName).includes(normalizeName(trimmed)))
+        .filter((e) => normalizeName(e.MemberName).includes(normalizeName(trimmed)))
         .slice(0, 10);
 
       if (!matches.length) {
@@ -1015,78 +880,62 @@
       }
 
       searchResults.innerHTML = '';
-      matches.forEach((match) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'search-result';
-        button.dataset.name = match.MemberName || '';
-        button.innerHTML = `
-          <strong>${match.MemberName}</strong>
-          <small>${match.FamilyName || 'Family invitation'}</small>
+      matches.forEach((m) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'search-result';
+        btn.dataset.name = m.MemberName || '';
+        btn.innerHTML = `
+          <strong>${m.MemberName}</strong>
+          <small>${m.FamilyName || 'Family invitation'}</small>
         `;
-        button.addEventListener('click', () => {
-          searchInput.value = match.MemberName || '';
+        btn.addEventListener('click', () => {
+          searchInput.value = m.MemberName || '';
           searchResults.classList.remove('is-visible');
-          handleSelection(match.MemberName || '');
+          handleSelection(m.MemberName || '');
         });
-        searchResults.appendChild(button);
+        searchResults.appendChild(btn);
       });
       searchResults.classList.add('is-visible');
     }
 
     function handleGuestData(entries) {
       const filteredEntries = Array.isArray(entries)
-        ? entries.filter((entry) => normalize(entry.MemberName))
+        ? entries.filter((e) => normalize(e.MemberName))
         : [];
-
       guestEntries = filteredEntries;
       familySummaries = buildFamilySummaries(filteredEntries);
       renderStatusFromFamilies(Object.values(familySummaries));
       renderSearchMatches(searchInput.value);
-      if (searchInput.value) {
-        handleSelection(searchInput.value);
-      }
+      if (searchInput.value) handleSelection(searchInput.value);
     }
 
     if (attendanceCheckboxes) {
-      attendanceCheckboxes.addEventListener('change', (event) => {
-        if (event.target && event.target.matches('input[type="checkbox"]')) {
-          refreshAttendingNames();
-        }
+      attendanceCheckboxes.addEventListener('change', (e) => {
+        if (e.target && e.target.matches('input[type="checkbox"]')) refreshAttendingNames();
       });
     }
 
     if (attendanceOptions) {
-      attendanceOptions.addEventListener('change', (event) => {
-        if (event.target && event.target.matches('input[type="radio"][name="Attendance"]')) {
-          const notAttending = event.target.value === 'Not Attending' && event.target.checked;
+      attendanceOptions.addEventListener('change', (e) => {
+        if (e.target && e.target.matches('input[type="radio"][name="Attendance"]')) {
+          const notAttending = e.target.value === 'Not Attending' && e.target.checked;
           toggleAttendanceCheckboxes(notAttending);
         }
       });
     }
 
     if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        renderSearchMatches(searchInput.value);
-      });
-
-      searchInput.addEventListener('blur', () => {
-        setTimeout(() => {
-          searchResults.classList.remove('is-visible');
-        }, 150);
-      });
-
-      searchInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
+      searchInput.addEventListener('input', () => renderSearchMatches(searchInput.value));
+      searchInput.addEventListener('blur', () => setTimeout(() => searchResults.classList.remove('is-visible'), 150));
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
           searchResults.classList.remove('is-visible');
           handleSelection(searchInput.value);
         }
       });
-
-      searchInput.addEventListener('change', () => {
-        handleSelection(searchInput.value);
-      });
+      searchInput.addEventListener('change', () => handleSelection(searchInput.value));
     }
 
     setFormEnabled(false);
@@ -1103,13 +952,14 @@
       }
     } else {
       fetch(RSVP_CSV_URL)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Unable to load RSVP data.');
-          }
-          return response.text();
+        .then((res) => {
+          if (!res.ok) throw new Error('Unable to load RSVP data.');
+          return res.text();
         })
-        .then((text) => handleGuestData(parseCSV(text)))
+        .then((text) => {
+          // console.log('CSV preview:', text.slice(0, 200)); // optional debug
+          handleGuestData(parseCSV(text));
+        })
         .catch(() => {
           setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
           const container = document.getElementById('rsvp-status');
@@ -1124,9 +974,9 @@
     }
 
     if (form) {
-      form.addEventListener('submit', (event) => {
+      form.addEventListener('submit', (e) => {
         if (!currentGuest) {
-          event.preventDefault();
+          e.preventDefault();
           setEligibility('error', 'Please select your name from the guest list before submitting.');
           return;
         }
@@ -1134,26 +984,26 @@
         const isLead = normalizeName(currentGuest.Role) === 'lead';
         const isOwner = Boolean(currentGuest.__owner);
         if (!isLead && !isOwner) {
-          event.preventDefault();
+          e.preventDefault();
           setEligibility('error', 'Only the designated family lead or a site admin can submit the RSVP.');
           return;
         }
 
         const selectedAttendance = formDetails.querySelector('input[name="Attendance"]:checked');
         if (!selectedAttendance) {
-          event.preventDefault();
+          e.preventDefault();
           setEligibility('error', 'Please select an attendance option before submitting.');
           return;
         }
 
         const notAttendingSelected = selectedAttendance.value === 'Not Attending';
         if (!notAttendingSelected && !attendingNamesField.value) {
-          event.preventDefault();
+          e.preventDefault();
           setEligibility('error', 'Select who will be attending before submitting your RSVP.');
           return;
         }
 
-        event.preventDefault();
+        e.preventDefault();
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
           .then(() => {
             alert('Thank you for your RSVP!');
