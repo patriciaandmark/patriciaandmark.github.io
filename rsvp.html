@@ -308,7 +308,12 @@
 
 <div class="rsvp-layout">
   <!-- Update data-owner-names with the names that should bypass the family lead check. Separate each name with a | character. -->
-  <div class="rsvp-form" data-owner-names="Patricia Example|Mark Example">
+  <div
+    class="rsvp-form"
+    data-owner-names="Patricia Example|Mark Example"
+    data-sheet-id="1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw"
+    data-sheet-gid="0"
+  >
     <form name="submit-to-google-sheet" autocomplete="off">
       <div class="guest-search">
         <label for="guest-search">Find your invitation</label>
@@ -365,7 +370,73 @@
 <script>
   (() => {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
-    const RSVP_CSV_URL = 'resources/rsvp-status.csv';
+    const formContainer = document.querySelector('.rsvp-form');
+
+    function getSheetConfig() {
+      const defaults = {
+        sheetId: '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw',
+        gid: '0',
+        sheetName: '',
+        query: '',
+      };
+
+      if (formContainer) {
+        if (formContainer.dataset.sheetId) {
+          defaults.sheetId = formContainer.dataset.sheetId;
+        }
+        if (formContainer.dataset.sheetGid) {
+          defaults.gid = formContainer.dataset.sheetGid;
+        }
+        if (formContainer.dataset.sheetName) {
+          defaults.sheetName = formContainer.dataset.sheetName;
+        }
+        if (formContainer.dataset.sheetQuery) {
+          defaults.query = formContainer.dataset.sheetQuery;
+        }
+      }
+
+      if (window.RSVP_SHEET_CONFIG && typeof window.RSVP_SHEET_CONFIG === 'object') {
+        const overrides = window.RSVP_SHEET_CONFIG;
+        if (overrides.sheetId) {
+          defaults.sheetId = overrides.sheetId;
+        }
+        if (overrides.gid || overrides.gid === 0) {
+          defaults.gid = String(overrides.gid);
+        }
+        if (overrides.sheetName) {
+          defaults.sheetName = overrides.sheetName;
+        }
+        if (typeof overrides.query === 'string') {
+          defaults.query = overrides.query;
+        }
+      }
+
+      return defaults;
+    }
+
+    function buildSheetCsvUrl(config) {
+      if (!config || !config.sheetId) {
+        return '';
+      }
+
+      const base = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq`;
+      const params = new URLSearchParams({ tqx: 'out:csv' });
+
+      if (config.query) {
+        params.set('tq', config.query);
+      }
+      if (config.sheetName) {
+        params.set('sheet', config.sheetName);
+      }
+      if (config.gid || config.gid === 0) {
+        params.set('gid', config.gid);
+      }
+
+      return `${base}?${params.toString()}`;
+    }
+
+    const SHEET_CONFIG = getSheetConfig();
+    const RSVP_CSV_URL = buildSheetCsvUrl(SHEET_CONFIG);
 
     const form = document.forms['submit-to-google-sheet'];
     const searchInput = document.getElementById('guest-search');
@@ -399,7 +470,6 @@
 
     function getOwnerOverrideNames() {
       const owners = new Set();
-      const formContainer = document.querySelector('.rsvp-form');
       if (formContainer && formContainer.dataset.ownerNames) {
         formContainer.dataset.ownerNames.split('|').forEach((name) => {
           const normalized = normalizeName(name);
@@ -464,16 +534,67 @@
     }
 
     function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/).filter(Boolean);
-      if (!rows.length) {
+      if (!text) {
         return [];
       }
 
-      const headers = rows[0].split(',').map((header) => header.trim());
-      return rows.slice(1).map((row) => {
-        const values = row.split(',').map((value) => value.trim());
+      const rows = [];
+      let currentValue = '';
+      let currentRow = [];
+      let insideQuotes = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+
+        if (char === '"') {
+          const nextChar = text[index + 1];
+          if (insideQuotes && nextChar === '"') {
+            currentValue += '"';
+            index += 1;
+          } else {
+            insideQuotes = !insideQuotes;
+          }
+          continue;
+        }
+
+        if (char === ',' && !insideQuotes) {
+          currentRow.push(currentValue);
+          currentValue = '';
+          continue;
+        }
+
+        if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (char === '\r' && text[index + 1] === '\n') {
+            index += 1;
+          }
+          currentRow.push(currentValue);
+          rows.push(currentRow);
+          currentRow = [];
+          currentValue = '';
+          continue;
+        }
+
+        currentValue += char;
+      }
+
+      if (currentValue.length || currentRow.length) {
+        currentRow.push(currentValue);
+        rows.push(currentRow);
+      }
+
+      const cleanedRows = rows
+        .map((row) => row.map((value) => String(value || '').trim()))
+        .filter((row) => row.some((value) => value.length));
+
+      if (!cleanedRows.length) {
+        return [];
+      }
+
+      const headers = cleanedRows[0].map((header) => header.replace(/^\uFEFF/, ''));
+
+      return cleanedRows.slice(1).map((row) => {
         return headers.reduce((entry, header, index) => {
-          entry[header] = values[index] ?? '';
+          entry[header] = row[index] ?? '';
           return entry;
         }, {});
       });
@@ -897,8 +1018,12 @@
     }
 
     function handleGuestData(entries) {
-      guestEntries = entries;
-      familySummaries = buildFamilySummaries(entries);
+      const filteredEntries = Array.isArray(entries)
+        ? entries.filter((entry) => normalize(entry.MemberName))
+        : [];
+
+      guestEntries = filteredEntries;
+      familySummaries = buildFamilySummaries(filteredEntries);
       renderStatusFromFamilies(Object.values(familySummaries));
       renderSearchMatches(searchInput.value);
       if (searchInput.value) {
@@ -949,25 +1074,37 @@
 
     setFormEnabled(false);
 
-    fetch(RSVP_CSV_URL)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Unable to load RSVP data.');
-        }
-        return response.text();
-      })
-      .then((text) => handleGuestData(parseCSV(text)))
-      .catch(() => {
-        setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
-        const container = document.getElementById('rsvp-status');
-        if (container) {
-          container.innerHTML = '<h3>Family RSVP Status</h3>';
-          const error = document.createElement('div');
-          error.className = 'status-error';
-          error.textContent = 'We could not load the latest RSVP information. Please refresh the page or try again later.';
-          container.appendChild(error);
-        }
-      });
+    if (!RSVP_CSV_URL) {
+      setEligibility('error', 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.');
+      const container = document.getElementById('rsvp-status');
+      if (container) {
+        container.innerHTML = '<h3>Family RSVP Status</h3>';
+        const error = document.createElement('div');
+        error.className = 'status-error';
+        error.textContent = 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.';
+        container.appendChild(error);
+      }
+    } else {
+      fetch(RSVP_CSV_URL)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Unable to load RSVP data.');
+          }
+          return response.text();
+        })
+        .then((text) => handleGuestData(parseCSV(text)))
+        .catch(() => {
+          setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
+          const container = document.getElementById('rsvp-status');
+          if (container) {
+            container.innerHTML = '<h3>Family RSVP Status</h3>';
+            const error = document.createElement('div');
+            error.className = 'status-error';
+            error.textContent = 'We could not load the latest RSVP information. Please refresh the page or try again later.';
+            container.appendChild(error);
+          }
+        });
+    }
 
     if (form) {
       form.addEventListener('submit', (event) => {
