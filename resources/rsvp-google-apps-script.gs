@@ -4,7 +4,8 @@
  * The site submits RSVPs with fields Name, Email, Attendance, FamilyID,
  * LeadName, and AttendingNames. The script stores the raw submission in a
  * "FormResponses" tab and updates the authoritative guest list that lives in
- * the "GuestList" tab.
+ * the "GuestList" tab. A GET request with ?action=guestList returns the
+ * current guest list as JSON for the static site.
  */
 const SHEET_ID = '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw';
 const GUEST_LIST_TAB = 'GuestList';
@@ -22,6 +23,22 @@ const RESPONSE_HEADERS = [
   'RawPayload',
 ];
 
+function doGet(e) {
+  try {
+    const action = ((e && e.parameter && e.parameter.action) || '').toString().toLowerCase();
+    if (!action || action === 'guestlist' || action === 'guest-list') {
+      const ss = SpreadsheetApp.openById(SHEET_ID);
+      const guestSheet = getRequiredSheet(ss, GUEST_LIST_TAB);
+      const rows = getGuestListRows(guestSheet);
+      return jsonResponse({ status: 'ok', rows: rows });
+    }
+    return jsonResponse({ status: 'error', message: 'Unsupported action.' });
+  } catch (error) {
+    Logger.log('[RSVP] Error handling GET request: %s', error);
+    return jsonResponse({ status: 'error', message: error.message || String(error) });
+  }
+}
+
 function doPost(e) {
   try {
     const payload = parsePayload(e);
@@ -38,6 +55,10 @@ function doPost(e) {
     Logger.log('[RSVP] Error handling submission: %s', error);
     return jsonResponse({ status: 'error', message: error.message || String(error) });
   }
+}
+
+function doOptions() {
+  return jsonResponse({ status: 'ok' });
 }
 
 function parsePayload(e) {
@@ -206,6 +227,40 @@ function updateGuestListRows(sheet, payload) {
   range.setValues(values);
 }
 
+function getGuestListRows(sheet) {
+  const values = sheet.getDataRange().getDisplayValues();
+  if (values.length <= 1) {
+    return [];
+  }
+
+  const headers = values[0].map(function (header) {
+    return (header || '').toString().trim();
+  });
+
+  const rows = [];
+  for (var row = 1; row < values.length; row++) {
+    var rowValues = values[row];
+    var record = {};
+    var isEmpty = true;
+    for (var col = 0; col < headers.length; col++) {
+      var key = headers[col];
+      if (!key) {
+        continue;
+      }
+      var cell = rowValues[col];
+      if (cell !== '' && cell != null) {
+        isEmpty = false;
+      }
+      record[key] = cell;
+    }
+    if (!isEmpty) {
+      rows.push(record);
+    }
+  }
+
+  return rows;
+}
+
 function mapHeaders(headers) {
   var map = {};
   for (var i = 0; i < headers.length; i++) {
@@ -222,5 +277,10 @@ function formatDateTime(date) {
 }
 
 function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    .setHeader('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
 }
