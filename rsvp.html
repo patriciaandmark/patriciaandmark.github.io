@@ -1,22 +1,159 @@
 <h2>RSVP</h2>
 <style>
-  .rsvp-form {
+  .rsvp-layout {
+    display: grid;
+    gap: 2rem;
+    margin: 2rem auto;
+    max-width: 1100px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+
+  .rsvp-form,
+  .rsvp-status {
     background: #fff;
     padding: 2rem;
     border-radius: 12px;
-    max-width: 500px;
-    margin: 2rem auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  .rsvp-form {
     text-align: left;
   }
-  .rsvp-form label {
+
+  .guest-search label {
+    display: block;
+    font-weight: 600;
+    color: #5e524b;
+  }
+
+  .guest-search input[type="search"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .search-results {
+    margin-top: 0.5rem;
+    border: 1px solid #e8e0d8;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .search-results.is-visible {
+    display: block;
+  }
+
+  .search-result {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .search-result:hover,
+  .search-result:focus {
+    background: #f7f1ed;
+    outline: none;
+  }
+
+  .search-result strong {
+    color: #5e524b;
+  }
+
+  .search-result small {
+    color: #9b9087;
+  }
+
+  .eligibility-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border: 1px solid transparent;
+  }
+
+  .eligibility-message[data-status="checking"] {
+    background: #f1ede9;
+    border-color: #e0d6cd;
+    color: #5e524b;
+  }
+
+  .eligibility-message[data-status="ok"] {
+    background: rgba(73, 160, 120, 0.12);
+    border-color: rgba(73, 160, 120, 0.35);
+    color: #2e6b4f;
+  }
+
+  .eligibility-message[data-status="info"] {
+    background: rgba(255, 193, 7, 0.12);
+    border-color: rgba(255, 193, 7, 0.35);
+    color: #8a6d00;
+  }
+
+  .eligibility-message[data-status="error"] {
+    background: rgba(220, 53, 69, 0.12);
+    border-color: rgba(220, 53, 69, 0.35);
+    color: #a12635;
+  }
+
+  .family-summary {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: #f7f1ed;
+    color: #5e524b;
+  }
+
+  .family-summary h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .family-summary p {
+    margin: 0.25rem 0;
+  }
+
+  .family-summary-members {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #5e524b;
+  }
+
+  .submission-lock {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(220, 53, 69, 0.12);
+    border: 1px solid rgba(220, 53, 69, 0.25);
+    color: #a12635;
+  }
+
+  .form-details {
+    margin-top: 1.5rem;
+  }
+
+  .form-details label {
     display: block;
     margin-top: 1rem;
     font-weight: 600;
     color: #5e524b;
   }
-  .rsvp-form input[type="text"],
-  .rsvp-form input[type="email"] {
+
+  .form-details input[type="text"],
+  .form-details input[type="email"] {
     width: 100%;
     padding: 0.75rem;
     margin-top: 0.25rem;
@@ -24,16 +161,48 @@
     border: 1px solid #ccc;
     font-family: 'Inter', sans-serif;
   }
-  .rsvp-form .options {
-    margin-top: 1rem;
+
+  .form-details .options {
+    margin-top: 0.5rem;
   }
-  .rsvp-form .options label {
+
+  .form-details .options label {
     font-weight: normal;
     display: block;
     margin-left: 1rem;
     margin-top: 0.5rem;
   }
-  .rsvp-form button {
+
+  .attendee-selector {
+    margin-top: 1.5rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+  }
+
+  .attendee-instructions {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    color: #7a6d64;
+  }
+
+  .attendance-checkboxes {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .attendee-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #5e524b;
+  }
+
+  .attendee-option input[type="checkbox"] {
+    accent-color: #c9bab0;
+  }
+
+  .rsvp-form button[type="submit"] {
     margin-top: 1.5rem;
     width: 100%;
     background-color: #c9bab0;
@@ -45,40 +214,956 @@
     cursor: pointer;
     transition: background 0.3s;
   }
-  .rsvp-form button:hover {
+
+  .rsvp-form button[type="submit"]:hover {
     background-color: #b3a69c;
+  }
+
+  .rsvp-form button[type="submit"]:disabled {
+    background-color: #e0d6cd;
+    cursor: not-allowed;
+  }
+
+  .rsvp-status h3 {
+    margin-top: 0;
+    color: #5e524b;
+  }
+
+  .status-summary {
+    background: #f7f1ed;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #5e524b;
+    line-height: 1.6;
+  }
+
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .status-table th,
+  .status-table td {
+    text-align: left;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #eee;
+    color: #5e524b;
+  }
+
+  .status-table th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7a6d64;
+  }
+
+  .status-chip {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status-chip[data-status="Confirmed"] {
+    background: rgba(73, 160, 120, 0.15);
+    color: #2e6b4f;
+  }
+
+  .status-chip[data-status="Pending"] {
+    background: rgba(255, 193, 7, 0.2);
+    color: #8a6d00;
+  }
+
+  .status-chip[data-status="Declined"] {
+    background: rgba(220, 53, 69, 0.15);
+    color: #a12635;
+  }
+
+  .status-updated {
+    font-size: 0.75rem;
+    color: #9b9087;
+  }
+
+  .status-members {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #5e524b;
+  }
+
+  .status-error {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #a12635;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .is-hidden {
+    display: none !important;
   }
 </style>
 
-<div class="rsvp-form">
-  <form name="submit-to-google-sheet">
-    <label for="name">Name</label>
-    <input name="Name" type="text" id="name" placeholder="Your full name" required>
+<div class="rsvp-layout">
+  <!-- Update data-owner-names with the names that should bypass the family lead check. Separate each name with a | character. -->
+  <div
+    class="rsvp-form"
+    data-owner-names="Patricia Example|Mark Example"
+    data-sheet-id="1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw"
+    data-sheet-gid="0"
+  >
+    <form name="submit-to-google-sheet" autocomplete="off">
+      <div class="guest-search">
+        <label for="guest-search">Find your invitation</label>
+        <input type="search" id="guest-search" placeholder="Start typing your name" autocomplete="off">
+        <div class="search-results" id="guest-results" role="listbox" aria-label="Guest matches"></div>
+      </div>
 
-    <label for="email">Email</label>
-    <input name="Email" type="email" id="email" placeholder="you@example.com" required>
+      <div class="eligibility-message" id="eligibility-message" data-status="checking">
+        Start typing your name to find your family invitation.
+      </div>
 
-    <label>Will you be attending?</label>
-    <div class="options">
-      <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label>
-      <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label>
-      <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label>
-      <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label>
-    </div>
+      <div class="family-summary is-hidden" id="family-summary">
+        <h3 id="family-summary-title"></h3>
+        <p id="family-summary-count"></p>
+        <div class="family-summary-members" id="family-summary-members"></div>
+      </div>
 
-    <button type="submit">Send RSVP</button>
-  </form>
+      <div class="submission-lock is-hidden" id="submission-lock">
+        We have already received this family's RSVP. For any changes in attendance, please contact Patricia & Mark directly.
+      </div>
+
+      <div class="form-details is-hidden" id="form-details">
+        <label for="email">Email</label>
+        <input name="Email" type="email" id="email" placeholder="you@example.com" disabled>
+
+        <label>Will you be attending?</label>
+        <div class="options" id="attendance-options">
+          <label><input type="radio" name="Attendance" value="Ceremony Only" disabled> Ceremony Only</label>
+          <label><input type="radio" name="Attendance" value="Reception Only" disabled> Reception Only</label>
+          <label><input type="radio" name="Attendance" value="Ceremony and Reception" disabled> Ceremony and Reception</label>
+          <label><input type="radio" name="Attendance" value="Not Attending" disabled> Not Attending</label>
+        </div>
+
+        <div class="attendee-selector" id="attendance-list">
+          <p class="attendee-instructions">Select who will be attending from your family group.</p>
+          <div class="attendance-checkboxes" id="attendance-checkboxes"></div>
+        </div>
+
+        <button type="submit" id="rsvp-submit" disabled>Send RSVP</button>
+      </div>
+
+      <input type="hidden" name="Name" id="name">
+      <input type="hidden" name="FamilyID" id="family-id">
+      <input type="hidden" name="LeadName" id="lead-name">
+      <input type="hidden" name="AttendingNames" id="attending-names">
+    </form>
+  </div>
+
+  <div class="rsvp-status" id="rsvp-status">
+    <h3>Family RSVP Status</h3>
+    <p class="status-loading">Loading family updates…</p>
+  </div>
 </div>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
-  const form = document.forms['submit-to-google-sheet'];
-  if (form) {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => alert("Thank you for your RSVP!"))
-        .catch(error => console.error('Error!', error.message));
-    });
-  }
+  (() => {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
+    const formContainer = document.querySelector('.rsvp-form');
+
+    function getSheetConfig() {
+      const defaults = {
+        sheetId: '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw',
+        gid: '0',
+        sheetName: '',
+        query: '',
+      };
+
+      if (formContainer) {
+        if (formContainer.dataset.sheetId) {
+          defaults.sheetId = formContainer.dataset.sheetId;
+        }
+        if (formContainer.dataset.sheetGid) {
+          defaults.gid = formContainer.dataset.sheetGid;
+        }
+        if (formContainer.dataset.sheetName) {
+          defaults.sheetName = formContainer.dataset.sheetName;
+        }
+        if (formContainer.dataset.sheetQuery) {
+          defaults.query = formContainer.dataset.sheetQuery;
+        }
+      }
+
+      if (window.RSVP_SHEET_CONFIG && typeof window.RSVP_SHEET_CONFIG === 'object') {
+        const overrides = window.RSVP_SHEET_CONFIG;
+        if (overrides.sheetId) {
+          defaults.sheetId = overrides.sheetId;
+        }
+        if (overrides.gid || overrides.gid === 0) {
+          defaults.gid = String(overrides.gid);
+        }
+        if (overrides.sheetName) {
+          defaults.sheetName = overrides.sheetName;
+        }
+        if (typeof overrides.query === 'string') {
+          defaults.query = overrides.query;
+        }
+      }
+
+      return defaults;
+    }
+
+    function buildSheetCsvUrl(config) {
+      if (!config || !config.sheetId) {
+        return '';
+      }
+
+      const base = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq`;
+      const params = new URLSearchParams({ tqx: 'out:csv' });
+
+      if (config.query) {
+        params.set('tq', config.query);
+      }
+      if (config.sheetName) {
+        params.set('sheet', config.sheetName);
+      }
+      if (config.gid || config.gid === 0) {
+        params.set('gid', config.gid);
+      }
+
+      return `${base}?${params.toString()}`;
+    }
+
+    const SHEET_CONFIG = getSheetConfig();
+    const RSVP_CSV_URL = buildSheetCsvUrl(SHEET_CONFIG);
+
+    const form = document.forms['submit-to-google-sheet'];
+    const searchInput = document.getElementById('guest-search');
+    const searchResults = document.getElementById('guest-results');
+    const eligibilityMessage = document.getElementById('eligibility-message');
+    const nameField = document.getElementById('name');
+    const emailField = document.getElementById('email');
+    const familyIdField = document.getElementById('family-id');
+    const leadNameField = document.getElementById('lead-name');
+    const attendingNamesField = document.getElementById('attending-names');
+    const formDetails = document.getElementById('form-details');
+    const familySummary = document.getElementById('family-summary');
+    const familySummaryTitle = document.getElementById('family-summary-title');
+    const familySummaryCount = document.getElementById('family-summary-count');
+    const familySummaryMembers = document.getElementById('family-summary-members');
+    const submissionLock = document.getElementById('submission-lock');
+    const attendanceCheckboxes = document.getElementById('attendance-checkboxes');
+    const attendanceOptions = document.getElementById('attendance-options');
+    const submitButton = document.getElementById('rsvp-submit');
+
+    let guestEntries = [];
+    let familySummaries = {};
+    let currentGuest = null;
+
+    function normalize(value) {
+      return String(value || '').trim();
+    }
+
+    function normalizeName(value) {
+      return normalize(value).toLowerCase();
+    }
+
+    function getOwnerOverrideNames() {
+      const owners = new Set();
+      if (formContainer && formContainer.dataset.ownerNames) {
+        formContainer.dataset.ownerNames.split('|').forEach((name) => {
+          const normalized = normalizeName(name);
+          if (normalized) {
+            owners.add(normalized);
+          }
+        });
+      }
+
+      if (Array.isArray(window.RSVP_OWNER_OVERRIDES)) {
+        window.RSVP_OWNER_OVERRIDES.forEach((name) => {
+          const normalized = normalizeName(name);
+          if (normalized) {
+            owners.add(normalized);
+          }
+        });
+      }
+
+      return Array.from(owners);
+    }
+
+    const OWNER_OVERRIDES = new Set(getOwnerOverrideNames());
+
+    function isOwnerName(name) {
+      if (!name) {
+        return false;
+      }
+      return OWNER_OVERRIDES.has(normalizeName(name));
+    }
+
+    function getFamilySummaryForGuest(guest) {
+      if (!guest) {
+        return null;
+      }
+
+      const key = normalizeName(guest.FamilyID || guest.FamilyName || '');
+      const existing = familySummaries[key];
+      if (existing) {
+        return existing;
+      }
+
+      const fallbackMembers = guestEntries
+        .filter((entry) => normalizeName(entry.FamilyID) === normalizeName(guest.FamilyID))
+        .map((entry) => normalize(entry.MemberName))
+        .filter(Boolean);
+
+      const members = fallbackMembers.length ? fallbackMembers : [normalize(guest.MemberName)];
+      const uniqueMembers = Array.from(new Set(members.filter(Boolean)));
+
+      return {
+        id: guest.FamilyID || '',
+        name: guest.FamilyName || 'Family invitation',
+        invited: Number(guest.GuestsInvited || uniqueMembers.length || 0),
+        attending: Number(guest.GuestsAttending || 0),
+        status: guest.RSVPStatus || 'Pending',
+        updated: guest.LastUpdated || '',
+        notes: guest.Notes || '',
+        contactEmail: guest.ContactEmail || '',
+        leadName: guest.LeadName || '',
+        members: uniqueMembers,
+      };
+    }
+
+    function parseCSV(text) {
+      if (!text) {
+        return [];
+      }
+
+      const rows = [];
+      let currentValue = '';
+      let currentRow = [];
+      let insideQuotes = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+
+        if (char === '"') {
+          const nextChar = text[index + 1];
+          if (insideQuotes && nextChar === '"') {
+            currentValue += '"';
+            index += 1;
+          } else {
+            insideQuotes = !insideQuotes;
+          }
+          continue;
+        }
+
+        if (char === ',' && !insideQuotes) {
+          currentRow.push(currentValue);
+          currentValue = '';
+          continue;
+        }
+
+        if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (char === '\r' && text[index + 1] === '\n') {
+            index += 1;
+          }
+          currentRow.push(currentValue);
+          rows.push(currentRow);
+          currentRow = [];
+          currentValue = '';
+          continue;
+        }
+
+        currentValue += char;
+      }
+
+      if (currentValue.length || currentRow.length) {
+        currentRow.push(currentValue);
+        rows.push(currentRow);
+      }
+
+      const cleanedRows = rows
+        .map((row) => row.map((value) => String(value || '').trim()))
+        .filter((row) => row.some((value) => value.length));
+
+      if (!cleanedRows.length) {
+        return [];
+      }
+
+      const headers = cleanedRows[0].map((header) => header.replace(/^\uFEFF/, ''));
+
+      return cleanedRows.slice(1).map((row) => {
+        return headers.reduce((entry, header, index) => {
+          entry[header] = row[index] ?? '';
+          return entry;
+        }, {});
+      });
+    }
+
+    function buildFamilySummaries(entries) {
+      return entries.reduce((families, entry) => {
+        const familyId = normalize(entry.FamilyID || entry.FamilyName || '');
+        const key = normalizeName(familyId);
+        if (!families[key]) {
+          families[key] = {
+            id: entry.FamilyID || '',
+            name: entry.FamilyName || 'Unnamed Family',
+            invited: Number(entry.GuestsInvited || 0),
+            attending: Number(entry.GuestsAttending || 0),
+            status: entry.RSVPStatus || 'Pending',
+            updated: entry.LastUpdated || '',
+            notes: entry.Notes || '',
+            contactEmail: entry.ContactEmail || '',
+            leadName: entry.LeadName || '',
+            members: [],
+          };
+        }
+
+        const family = families[key];
+        const memberName = normalize(entry.MemberName);
+        if (memberName && !family.members.includes(memberName)) {
+          family.members.push(memberName);
+        }
+
+        if ((entry.Role || '').toLowerCase() === 'lead') {
+          family.leadName = memberName || family.leadName;
+          family.status = entry.RSVPStatus || family.status;
+          family.attending = Number(entry.GuestsAttending || family.attending || 0);
+          family.updated = entry.LastUpdated || family.updated;
+          family.notes = entry.Notes || family.notes;
+          family.contactEmail = entry.ContactEmail || family.contactEmail;
+        }
+
+        return families;
+      }, {});
+    }
+
+    function renderStatusFromFamilies(families) {
+      const container = document.getElementById('rsvp-status');
+      if (!container) {
+        return;
+      }
+
+      container.innerHTML = '<h3>Family RSVP Status</h3>';
+
+      if (!families.length) {
+        const emptyState = document.createElement('p');
+        emptyState.textContent = 'No RSVP information is available yet.';
+        container.appendChild(emptyState);
+        return;
+      }
+
+      const totals = families.reduce(
+        (summary, family) => {
+          summary.invited += Number(family.invited || 0);
+          summary.attending += Number(family.attending || 0);
+          if ((family.status || '').toLowerCase() === 'confirmed') {
+            summary.confirmed += 1;
+          } else if ((family.status || '').toLowerCase() === 'declined') {
+            summary.declined += 1;
+          } else {
+            summary.pending += 1;
+          }
+          return summary;
+        },
+        { invited: 0, attending: 0, confirmed: 0, pending: 0, declined: 0 }
+      );
+
+      const summaryBlock = document.createElement('div');
+      summaryBlock.className = 'status-summary';
+      summaryBlock.innerHTML = `
+        <strong>Total Invited:</strong> ${totals.invited}<br>
+        <strong>Total Attending:</strong> ${totals.attending}<br>
+        <strong>Families Confirmed:</strong> ${totals.confirmed} ·
+        <strong>Pending:</strong> ${totals.pending} ·
+        <strong>Declined:</strong> ${totals.declined}
+      `;
+      container.appendChild(summaryBlock);
+
+      const table = document.createElement('table');
+      table.className = 'status-table';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Family</th>
+            <th>Lead</th>
+            <th>Invited</th>
+            <th>Attending</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = table.querySelector('tbody');
+
+      families
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach((family) => {
+          const row = document.createElement('tr');
+          const status = family.status || 'Pending';
+          const members = family.members.filter(Boolean).join(', ');
+
+          row.innerHTML = `
+            <td>
+              <strong>${family.name}</strong>
+              <div class="status-members">${members}</div>
+            </td>
+            <td>${family.leadName || '—'}</td>
+            <td>${family.invited || 0}</td>
+            <td>${family.attending || 0}</td>
+            <td>
+              <span class="status-chip" data-status="${status}">${status}</span>
+              ${family.updated ? `<div class="status-updated">Updated ${family.updated}</div>` : ''}
+            </td>
+          `;
+
+          tbody.appendChild(row);
+        });
+
+      container.appendChild(table);
+    }
+
+    function setEligibility(status, message) {
+      if (!eligibilityMessage) {
+        return;
+      }
+      eligibilityMessage.dataset.status = status;
+      eligibilityMessage.textContent = message;
+    }
+
+    function setFormEnabled(enabled) {
+      if (!formDetails) {
+        return;
+      }
+
+      [emailField, submitButton].forEach((field) => {
+        if (field) {
+          field.disabled = !enabled;
+        }
+      });
+
+      if (emailField) {
+        emailField.required = enabled;
+      }
+
+      const radios = formDetails.querySelectorAll('input[type="radio"][name="Attendance"]');
+      radios.forEach((radio) => {
+        radio.disabled = !enabled;
+        if (!enabled) {
+          radio.checked = false;
+        }
+      });
+
+      const checkboxes = attendanceCheckboxes.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach((checkbox) => {
+        checkbox.disabled = !enabled;
+        if (!enabled) {
+          checkbox.checked = false;
+        }
+      });
+
+      if (!enabled) {
+        attendingNamesField.value = '';
+      }
+    }
+
+    function showFamilySummary(family) {
+      if (!family) {
+        familySummary.classList.add('is-hidden');
+        familySummaryTitle.textContent = '';
+        familySummaryCount.textContent = '';
+        familySummaryMembers.textContent = '';
+        return;
+      }
+
+      familySummary.classList.remove('is-hidden');
+      familySummaryTitle.textContent = `${family.name}`;
+      const invited = Number(family.invited || 0);
+      familySummaryCount.textContent = invited
+        ? `Invitation covers ${invited} guest${invited === 1 ? '' : 's'}.`
+        : 'Invitation guest count unavailable.';
+
+      const members = family.members.filter(Boolean);
+      familySummaryMembers.textContent = members.length
+        ? `Family members on this invitation: ${members.join(', ')}.`
+        : '';
+    }
+
+    function showSubmissionLock(message) {
+      submissionLock.classList.remove('is-hidden');
+      submissionLock.textContent = message;
+      formDetails.classList.add('is-hidden');
+      setFormEnabled(false);
+    }
+
+    function hideSubmissionLock() {
+      submissionLock.classList.add('is-hidden');
+    }
+
+    function renderAttendanceSelector(family, selected = []) {
+      attendanceCheckboxes.innerHTML = '';
+      if (!family) {
+        return;
+      }
+
+      const members = family.members.filter(Boolean);
+      if (!members.length && currentGuest) {
+        members.push(currentGuest.MemberName);
+      }
+
+      const normalizedSelected = new Set(selected.map((name) => normalizeName(name)));
+
+      members.forEach((member) => {
+        const option = document.createElement('label');
+        option.className = 'attendee-option';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = member;
+        checkbox.checked = normalizedSelected.size ? normalizedSelected.has(normalizeName(member)) : true;
+
+        option.appendChild(checkbox);
+        option.appendChild(document.createTextNode(member));
+        attendanceCheckboxes.appendChild(option);
+      });
+
+      refreshAttendingNames();
+      setTimeout(() => {
+        const notAttending = formDetails.querySelector('input[name="Attendance"][value="Not Attending"]');
+        if (notAttending && notAttending.checked) {
+          toggleAttendanceCheckboxes(true);
+        }
+      }, 0);
+    }
+
+    function refreshAttendingNames() {
+      const selected = Array.from(attendanceCheckboxes.querySelectorAll('input[type="checkbox"]:checked'))
+        .map((checkbox) => normalize(checkbox.value))
+        .filter(Boolean);
+      attendingNamesField.value = selected.join(', ');
+    }
+
+    function toggleAttendanceCheckboxes(disable) {
+      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.disabled = disable;
+        if (disable) {
+          checkbox.checked = false;
+        } else if (!attendingNamesField.value) {
+          checkbox.checked = true;
+        }
+      });
+
+      if (disable) {
+        attendingNamesField.value = '';
+      } else {
+        refreshAttendingNames();
+      }
+    }
+
+    function isFamilyLocked(family) {
+      if (!family) {
+        return false;
+      }
+      const status = normalizeName(family.status);
+      return Boolean(status && status !== 'pending');
+    }
+
+    function findGuestByName(name) {
+      if (!name) {
+        return null;
+      }
+      const normalized = normalizeName(name);
+      return guestEntries.find((entry) => normalizeName(entry.MemberName) === normalized) || null;
+    }
+
+    function findFamilyLead(familyId) {
+      const normalizedId = normalizeName(familyId);
+      return guestEntries.find((entry) => {
+        return normalizeName(entry.FamilyID) === normalizedId && normalizeName(entry.Role) === 'lead';
+      });
+    }
+
+    function handleSelection(nameFromInput) {
+      const rawName = normalize(nameFromInput);
+      const ownerOverride = isOwnerName(rawName);
+
+      if (!guestEntries.length) {
+        if (ownerOverride) {
+          setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
+        } else {
+          setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
+        }
+        return;
+      }
+
+      if (!rawName) {
+        currentGuest = null;
+        nameField.value = '';
+        familyIdField.value = '';
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
+        attendingNamesField.value = '';
+        setEligibility('checking', 'Start typing your name to find your invitation.');
+        familySummary.classList.add('is-hidden');
+        formDetails.classList.add('is-hidden');
+        hideSubmissionLock();
+        return;
+      }
+
+      const guest = findGuestByName(rawName);
+      if (!guest && !ownerOverride) {
+        setEligibility('error', 'We could not find your name on the guest list. Double-check the spelling or contact Patricia & Mark.');
+        familySummary.classList.add('is-hidden');
+        formDetails.classList.add('is-hidden');
+        hideSubmissionLock();
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
+        return;
+      }
+
+      if (!guest && ownerOverride) {
+        setEligibility('info', `Welcome ${rawName}! Use the search results to pick a family so you can submit an RSVP on their behalf.`);
+        familySummary.classList.add('is-hidden');
+        formDetails.classList.add('is-hidden');
+        hideSubmissionLock();
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
+        return;
+      }
+
+      const family = getFamilySummaryForGuest(guest);
+      currentGuest = { ...guest, __owner: ownerOverride };
+      nameField.value = guest.MemberName || rawName;
+      familyIdField.value = guest.FamilyID || '';
+      if (leadNameField) {
+        leadNameField.value = '';
+      }
+
+      showFamilySummary(family);
+      hideSubmissionLock();
+
+      const isLead = ownerOverride || normalizeName(guest.Role) === 'lead';
+      const familyLead = isLead ? guest : findFamilyLead(guest.FamilyID);
+      const leadName = familyLead?.MemberName || familyLead?.LeadName || guest.LeadName || '';
+      if (leadNameField) {
+        leadNameField.value = leadName || '';
+      }
+
+      if (!isLead) {
+        setEligibility('info', `Hi ${guest.MemberName}! Please ask ${leadName || 'your family lead'} to submit the RSVP for your family.`);
+        formDetails.classList.add('is-hidden');
+        setFormEnabled(false);
+        return;
+      }
+
+      const locked = isFamilyLocked(family);
+      if (locked && !ownerOverride) {
+        const dateText = family?.updated ? ` on ${family.updated}` : '';
+        showSubmissionLock(`Hi ${guest.MemberName}! We already received the RSVP for the ${family?.name || 'family'}${dateText}. For any changes in attendance, please contact Patricia & Mark directly.`);
+        setEligibility('info', 'This RSVP has already been submitted. Reach out to Patricia & Mark if anything needs to be updated.');
+        return;
+      }
+
+      let welcomeMessage = ownerOverride && normalizeName(guest.Role) !== 'lead'
+        ? `Welcome ${guest.MemberName}! You have admin access to submit the RSVP for the ${family?.name || 'family'}.`
+        : `Welcome ${guest.MemberName}! You can submit the RSVP for the ${family?.name || 'family'}.`;
+
+      if (ownerOverride && normalizeName(guest.Role) !== 'lead' && leadName) {
+        welcomeMessage += ` The listed family lead is ${leadName}.`;
+      }
+
+      setEligibility('ok', welcomeMessage);
+
+      formDetails.classList.remove('is-hidden');
+      const radios = formDetails.querySelectorAll('input[name="Attendance"]');
+      radios.forEach((radio) => {
+        radio.checked = false;
+      });
+      if (emailField) {
+        emailField.value = '';
+      }
+      setFormEnabled(true);
+      renderAttendanceSelector(family);
+    }
+
+    function renderSearchMatches(query) {
+      if (!searchResults) {
+        return;
+      }
+
+      const trimmed = normalize(query);
+      if (!trimmed || !guestEntries.length) {
+        searchResults.classList.remove('is-visible');
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      const matches = guestEntries
+        .filter((entry) => normalizeName(entry.MemberName).includes(normalizeName(trimmed)))
+        .slice(0, 10);
+
+      if (!matches.length) {
+        searchResults.classList.remove('is-visible');
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      searchResults.innerHTML = '';
+      matches.forEach((match) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'search-result';
+        button.dataset.name = match.MemberName || '';
+        button.innerHTML = `
+          <strong>${match.MemberName}</strong>
+          <small>${match.FamilyName || 'Family invitation'}</small>
+        `;
+        button.addEventListener('click', () => {
+          searchInput.value = match.MemberName || '';
+          searchResults.classList.remove('is-visible');
+          handleSelection(match.MemberName || '');
+        });
+        searchResults.appendChild(button);
+      });
+      searchResults.classList.add('is-visible');
+    }
+
+    function handleGuestData(entries) {
+      const filteredEntries = Array.isArray(entries)
+        ? entries.filter((entry) => normalize(entry.MemberName))
+        : [];
+
+      guestEntries = filteredEntries;
+      familySummaries = buildFamilySummaries(filteredEntries);
+      renderStatusFromFamilies(Object.values(familySummaries));
+      renderSearchMatches(searchInput.value);
+      if (searchInput.value) {
+        handleSelection(searchInput.value);
+      }
+    }
+
+    if (attendanceCheckboxes) {
+      attendanceCheckboxes.addEventListener('change', (event) => {
+        if (event.target && event.target.matches('input[type="checkbox"]')) {
+          refreshAttendingNames();
+        }
+      });
+    }
+
+    if (attendanceOptions) {
+      attendanceOptions.addEventListener('change', (event) => {
+        if (event.target && event.target.matches('input[type="radio"][name="Attendance"]')) {
+          const notAttending = event.target.value === 'Not Attending' && event.target.checked;
+          toggleAttendanceCheckboxes(notAttending);
+        }
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        renderSearchMatches(searchInput.value);
+      });
+
+      searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+          searchResults.classList.remove('is-visible');
+        }, 150);
+      });
+
+      searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          searchResults.classList.remove('is-visible');
+          handleSelection(searchInput.value);
+        }
+      });
+
+      searchInput.addEventListener('change', () => {
+        handleSelection(searchInput.value);
+      });
+    }
+
+    setFormEnabled(false);
+
+    if (!RSVP_CSV_URL) {
+      setEligibility('error', 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.');
+      const container = document.getElementById('rsvp-status');
+      if (container) {
+        container.innerHTML = '<h3>Family RSVP Status</h3>';
+        const error = document.createElement('div');
+        error.className = 'status-error';
+        error.textContent = 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.';
+        container.appendChild(error);
+      }
+    } else {
+      fetch(RSVP_CSV_URL)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Unable to load RSVP data.');
+          }
+          return response.text();
+        })
+        .then((text) => handleGuestData(parseCSV(text)))
+        .catch(() => {
+          setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
+          const container = document.getElementById('rsvp-status');
+          if (container) {
+            container.innerHTML = '<h3>Family RSVP Status</h3>';
+            const error = document.createElement('div');
+            error.className = 'status-error';
+            error.textContent = 'We could not load the latest RSVP information. Please refresh the page or try again later.';
+            container.appendChild(error);
+          }
+        });
+    }
+
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        if (!currentGuest) {
+          event.preventDefault();
+          setEligibility('error', 'Please select your name from the guest list before submitting.');
+          return;
+        }
+
+        const isLead = normalizeName(currentGuest.Role) === 'lead';
+        const isOwner = Boolean(currentGuest.__owner);
+        if (!isLead && !isOwner) {
+          event.preventDefault();
+          setEligibility('error', 'Only the designated family lead or a site admin can submit the RSVP.');
+          return;
+        }
+
+        const selectedAttendance = formDetails.querySelector('input[name="Attendance"]:checked');
+        if (!selectedAttendance) {
+          event.preventDefault();
+          setEligibility('error', 'Please select an attendance option before submitting.');
+          return;
+        }
+
+        const notAttendingSelected = selectedAttendance.value === 'Not Attending';
+        if (!notAttendingSelected && !attendingNamesField.value) {
+          event.preventDefault();
+          setEligibility('error', 'Select who will be attending before submitting your RSVP.');
+          return;
+        }
+
+        event.preventDefault();
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+          .then(() => {
+            alert('Thank you for your RSVP!');
+            handleSelection(searchInput.value);
+          })
+          .catch((error) => {
+            console.error('Error!', error.message);
+            setEligibility('error', 'Something went wrong while submitting. Please try again.');
+          });
+      });
+    }
+  })();
 </script>
