@@ -13,9 +13,6 @@
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  }
-
-  .rsvp-form {
     text-align: left;
   }
 
@@ -44,10 +41,7 @@
     overflow-y: auto;
     display: none;
   }
-
-  .search-results.is-visible {
-    display: block;
-  }
+  .search-results.is-visible { display: block; }
 
   .search-result {
     display: flex;
@@ -60,20 +54,9 @@
     font-size: 0.95rem;
     cursor: pointer;
   }
-
-  .search-result:hover,
-  .search-result:focus {
-    background: #f7f1ed;
-    outline: none;
-  }
-
-  .search-result strong {
-    color: #5e524b;
-  }
-
-  .search-result small {
-    color: #9b9087;
-  }
+  .search-result:hover, .search-result:focus { background: #f7f1ed; outline: none; }
+  .search-result strong { color: #5e524b; }
+  .search-result small { color: #9b9087; }
 
   .eligibility-message {
     margin-top: 1rem;
@@ -83,123 +66,41 @@
     line-height: 1.5;
     border: 1px solid transparent;
   }
+  .eligibility-message[data-status="checking"] { background: #f1ede9; border-color: #e0d6cd; color: #5e524b; }
+  .eligibility-message[data-status="ok"]       { background: rgba(73,160,120,.12); border-color: rgba(73,160,120,.35); color:#2e6b4f; }
+  .eligibility-message[data-status="info"]     { background: rgba(255,193,7,.12); border-color: rgba(255,193,7,.35); color:#8a6d00; }
+  .eligibility-message[data-status="error"]    { background: rgba(220,53,69,.12); border-color: rgba(220,53,69,.35); color:#a12635; }
 
-  .eligibility-message[data-status="checking"] {
-    background: #f1ede9;
-    border-color: #e0d6cd;
-    color: #5e524b;
-  }
+  .family-summary { margin-top: 1.5rem; padding: 1rem; border-radius: 10px; background: #f7f1ed; color: #5e524b; }
+  .family-summary h3 { margin: 0 0 .5rem; font-size: 1.1rem; }
+  .family-summary p { margin: .25rem 0; }
+  .family-summary-members { margin-top: .75rem; font-size: .9rem; color: #5e524b; }
 
-  .eligibility-message[data-status="ok"] {
-    background: rgba(73, 160, 120, 0.12);
-    border-color: rgba(73, 160, 120, 0.35);
-    color: #2e6b4f;
-  }
+  .submission-lock { margin-top: 1rem; padding: 1rem; border-radius: 8px; background: rgba(220,53,69,.12); border: 1px solid rgba(220,53,69,.25); color: #a12635; }
 
-  .eligibility-message[data-status="info"] {
-    background: rgba(255, 193, 7, 0.12);
-    border-color: rgba(255, 193, 7, 0.35);
-    color: #8a6d00;
-  }
-
-  .eligibility-message[data-status="error"] {
-    background: rgba(220, 53, 69, 0.12);
-    border-color: rgba(220, 53, 69, 0.35);
-    color: #a12635;
-  }
-
-  .family-summary {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 10px;
-    background: #f7f1ed;
-    color: #5e524b;
-  }
-
-  .family-summary h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.1rem;
-  }
-
-  .family-summary p {
-    margin: 0.25rem 0;
-  }
-
-  .family-summary-members {
-    margin-top: 0.75rem;
-    font-size: 0.9rem;
-    color: #5e524b;
-  }
-
-  .submission-lock {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(220, 53, 69, 0.12);
-    border: 1px solid rgba(220, 53, 69, 0.25);
-    color: #a12635;
-  }
-
-  .form-details {
-    margin-top: 1.5rem;
-  }
-
-  .form-details label {
-    display: block;
-    margin-top: 1rem;
-    font-weight: 600;
-    color: #5e524b;
-  }
-
-  .form-details input[type="text"],
-  .form-details input[type="email"] {
+  .form-details { margin-top: 1.5rem; }
+  .form-details label { display: block; margin-top: 1rem; font-weight: 600; color: #5e524b; }
+  .form-details textarea {
     width: 100%;
+    min-height: 80px;
     padding: 0.75rem;
     margin-top: 0.25rem;
     border-radius: 8px;
     border: 1px solid #ccc;
     font-family: 'Inter', sans-serif;
+    resize: vertical;
   }
 
-  .form-details .options {
-    margin-top: 0.5rem;
-  }
+  .attendee-selector { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; }
+  .attendee-instructions { margin: 0 0 .75rem; font-size: .9rem; color: #7a6d64; }
+  .attendance-rows { display: grid; gap: .5rem; }
 
-  .form-details .options label {
-    font-weight: normal;
-    display: block;
-    margin-left: 1rem;
-    margin-top: 0.5rem;
+  .attendee-row {
+    display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+    border: 1px solid #eee; border-radius: 8px; padding: .5rem .75rem; background: #faf9f8;
   }
-
-  .attendee-selector {
-    margin-top: 1.5rem;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
-  }
-
-  .attendee-instructions {
-    margin: 0 0 0.75rem;
-    font-size: 0.9rem;
-    color: #7a6d64;
-  }
-
-  .attendance-checkboxes {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .attendee-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    color: #5e524b;
-  }
-
-  .attendee-option input[type="checkbox"] {
-    accent-color: #c9bab0;
-  }
+  .attendee-name { font-weight: 600; color: #5e524b; }
+  .attendee-select { border: 1px solid #ccc; border-radius: 8px; padding: .4rem .6rem; background: #fff; }
 
   .rsvp-form button[type="submit"] {
     margin-top: 1.5rem;
@@ -213,39 +114,24 @@
     cursor: pointer;
     transition: background 0.3s;
   }
+  .rsvp-form button[type="submit"]:hover { background-color: #b3a69c; }
+  .rsvp-form button[type="submit"]:disabled { background-color: #e0d6cd; cursor: not-allowed; }
 
-  .rsvp-form button[type="submit"]:hover {
-    background-color: #b3a69c;
-  }
-
-  .rsvp-form button[type="submit"]:disabled {
-    background-color: #e0d6cd;
-    cursor: not-allowed;
-  }
-
-
-  .is-hidden {
-    display: none !important;
-  }
+  .is-hidden { display: none !important; }
 </style>
 
 <div class="rsvp-layout">
-  <!-- Update data-owner-names with the names that should bypass the family lead check. Separate each name with a | character. -->
-  <div
-    class="rsvp-form"
-    data-owner-names="Patricia Example|Mark Example"
-    data-sheet-id="1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw"
-    data-sheet-name="GuestList"
-  >
-    <form name="submit-to-google-sheet" autocomplete="off">
+  <!-- Admin override names (can submit for any family). Separate with | -->
+  <div class="rsvp-form" data-owner-names="Patricia Example|Mark Example">
+    <form id="rsvp-form" autocomplete="off">
       <div class="guest-search">
-        <label for="guest-search">Find your invitation</label>
-        <input type="search" id="guest-search" placeholder="Start typing your name" autocomplete="off">
-        <div class="search-results" id="guest-results" role="listbox" aria-label="Guest matches"></div>
+        <label for="guest-search">Find your invitation (type the LEAD name)</label>
+        <input type="search" id="guest-search" placeholder="e.g., Mariel Jabillo" autocomplete="off">
+        <div class="search-results" id="guest-results" role="listbox" aria-label="Matches"></div>
       </div>
 
       <div class="eligibility-message" id="eligibility-message" data-status="checking">
-        Start typing your name to find your family invitation.
+        Type the family lead’s full name, then press Enter.
       </div>
 
       <div class="family-summary is-hidden" id="family-summary">
@@ -255,734 +141,253 @@
       </div>
 
       <div class="submission-lock is-hidden" id="submission-lock">
-        We have already received this family's RSVP. For any changes in attendance, please contact Patricia & Mark directly.
+        We have already received this family's RSVP. For any changes in attendance, please contact the couple.
       </div>
 
       <div class="form-details is-hidden" id="form-details">
-        <label for="email">Email</label>
-        <input name="Email" type="email" id="email" placeholder="you@example.com" disabled>
+        <label for="notes">Notes (optional)</label>
+        <textarea id="notes" placeholder="Dietary needs, seating, etc."></textarea>
 
-        <label>Will you be attending?</label>
-        <div class="options" id="attendance-options">
-          <label><input type="radio" name="Attendance" value="Ceremony Only" disabled> Ceremony Only</label>
-          <label><input type="radio" name="Attendance" value="Reception Only" disabled> Reception Only</label>
-          <label><input type="radio" name="Attendance" value="Ceremony and Reception" disabled> Ceremony and Reception</label>
-          <label><input type="radio" name="Attendance" value="Not Attending" disabled> Not Attending</label>
-        </div>
-
-        <div class="attendee-selector" id="attendance-list">
-          <p class="attendee-instructions">Select who will be attending from your family group.</p>
-          <div class="attendance-checkboxes" id="attendance-checkboxes"></div>
+        <div class="attendee-selector">
+          <p class="attendee-instructions">Confirm attendance for each member below.</p>
+          <div class="attendance-rows" id="attendance-rows"></div>
         </div>
 
         <button type="submit" id="rsvp-submit" disabled>Send RSVP</button>
       </div>
-
-      <input type="hidden" name="Name" id="name">
-      <input type="hidden" name="FamilyID" id="family-id">
-      <input type="hidden" name="LeadName" id="lead-name">
-      <input type="hidden" name="AttendingNames" id="attending-names">
     </form>
   </div>
-
 </div>
 
 <script>
-  (() => {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
-    const formContainer = document.querySelector('.rsvp-form');
-    let guestListEndpoint = '';
-
-    // --- FIX #1: no default gid; prefer sheetName
-    function getSheetConfig() {
-      const defaults = {
-        sheetId: '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw',
-        gid: null,          // <--- was "0"; now null so it won't be used by default
-        sheetName: '',
-        query: '',
-        guestListEndpoint: '',
-      };
-
-      if (formContainer) {
-        if (formContainer.dataset.sheetId) {
-          defaults.sheetId = formContainer.dataset.sheetId;
-        }
-        if (formContainer.dataset.sheetGid) {
-          // only set gid if explicitly provided in markup
-          defaults.gid = formContainer.dataset.sheetGid;
-        }
-        if (formContainer.dataset.sheetName) {
-          defaults.sheetName = formContainer.dataset.sheetName;
-        }
-        if (formContainer.dataset.sheetQuery) {
-          defaults.query = formContainer.dataset.sheetQuery;
-        }
-        if (formContainer.dataset.guestListEndpoint) {
-          defaults.guestListEndpoint = formContainer.dataset.guestListEndpoint;
-        }
-      }
-
-      if (window.RSVP_SHEET_CONFIG && typeof window.RSVP_SHEET_CONFIG === 'object') {
-        const overrides = window.RSVP_SHEET_CONFIG;
-        if (overrides.sheetId) defaults.sheetId = overrides.sheetId;
-        // handle 0 correctly but still stringify later
-        if (overrides.gid !== undefined && overrides.gid !== null && overrides.gid !== '') {
-          defaults.gid = overrides.gid;
-        }
-        if (overrides.sheetName) defaults.sheetName = overrides.sheetName;
-        if (typeof overrides.query === 'string') defaults.query = overrides.query;
-        if (overrides.guestListEndpoint) defaults.guestListEndpoint = overrides.guestListEndpoint;
-      }
-
-      return defaults;
-    }
-
-    // --- FIX #2: only include gid if sheetName is NOT present
-    function buildSheetCsvUrl(config) {
-      if (!config || !config.sheetId) return '';
-
-      const base = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq`;
-      const params = new URLSearchParams({ tqx: 'out:csv' });
-
-      if (config.query) params.set('tq', config.query);
-
-      if (config.sheetName) {
-        params.set('sheet', config.sheetName);
-        // IMPORTANT: do NOT also set gid when sheetName is provided
-      } else if (config.gid !== null && config.gid !== undefined && config.gid !== '') {
-        params.set('gid', String(config.gid));
-      }
-
-      return `${base}?${params.toString()}`;
-    }
-
-    const SHEET_CONFIG = getSheetConfig();
-    const RSVP_CSV_URL = buildSheetCsvUrl(SHEET_CONFIG);
-    const endpointFromConfig = normalize(SHEET_CONFIG.guestListEndpoint);
-    guestListEndpoint = endpointFromConfig || (scriptURL ? `${scriptURL}?action=guestList` : '');
-
-    const form = document.forms['submit-to-google-sheet'];
-    const searchInput = document.getElementById('guest-search');
-    const searchResults = document.getElementById('guest-results');
-    const eligibilityMessage = document.getElementById('eligibility-message');
-    const nameField = document.getElementById('name');
-    const emailField = document.getElementById('email');
-    const familyIdField = document.getElementById('family-id');
-    const leadNameField = document.getElementById('lead-name');
-    const attendingNamesField = document.getElementById('attending-names');
-    const formDetails = document.getElementById('form-details');
-    const familySummary = document.getElementById('family-summary');
-    const familySummaryTitle = document.getElementById('family-summary-title');
-    const familySummaryCount = document.getElementById('family-summary-count');
-    const familySummaryMembers = document.getElementById('family-summary-members');
-    const submissionLock = document.getElementById('submission-lock');
-    const attendanceCheckboxes = document.getElementById('attendance-checkboxes');
-    const attendanceOptions = document.getElementById('attendance-options');
-    const submitButton = document.getElementById('rsvp-submit');
-
-    let guestEntries = [];
-    let familySummaries = {};
-    let currentGuest = null;
-    let guestListLoaded = false;
-    let guestListFailed = false;
-
-    function normalize(value) { return String(value || '').trim(); }
-    function normalizeName(value) { return normalize(value).toLowerCase(); }
-
-    function getOwnerOverrideNames() {
-      const owners = new Set();
-      if (formContainer && formContainer.dataset.ownerNames) {
-        formContainer.dataset.ownerNames.split('|').forEach((name) => {
-          const n = normalizeName(name);
-          if (n) owners.add(n);
-        });
-      }
-      if (Array.isArray(window.RSVP_OWNER_OVERRIDES)) {
-        window.RSVP_OWNER_OVERRIDES.forEach((name) => {
-          const n = normalizeName(name);
-          if (n) owners.add(n);
-        });
-      }
-      return Array.from(owners);
-    }
-
-    const OWNER_OVERRIDES = new Set(getOwnerOverrideNames());
-    const isOwnerName = (name) => name && OWNER_OVERRIDES.has(normalizeName(name));
-
-    function getFamilySummaryForGuest(guest) {
-      if (!guest) return null;
-
-      const key = normalizeName(guest.FamilyID || guest.FamilyName || '');
-      const existing = familySummaries[key];
-      if (existing) return existing;
-
-      const fallbackMembers = guestEntries
-        .filter((entry) => normalizeName(entry.FamilyID) === normalizeName(guest.FamilyID))
-        .map((entry) => normalize(entry.MemberName))
-        .filter(Boolean);
-
-      const members = fallbackMembers.length ? fallbackMembers : [normalize(guest.MemberName)];
-      const uniqueMembers = Array.from(new Set(members.filter(Boolean)));
-
-      return {
-        id: guest.FamilyID || '',
-        name: guest.FamilyName || 'Family invitation',
-        invited: Number(guest.GuestsInvited || uniqueMembers.length || 0),
-        attending: Number(guest.GuestsAttending || 0),
-        status: guest.RSVPStatus || 'Pending',
-        updated: guest.LastUpdated || '',
-        notes: guest.Notes || '',
-        contactEmail: guest.ContactEmail || '',
-        leadName: guest.LeadName || '',
-        members: uniqueMembers,
-      };
-    }
-
-    // unchanged CSV parser
-    function parseCSV(text) {
-      if (!text) return [];
-      const rows = [];
-      let currentValue = '';
-      let currentRow = [];
-      let insideQuotes = false;
-
-      for (let i = 0; i < text.length; i += 1) {
-        const ch = text[i];
-        if (ch === '"') {
-          const next = text[i + 1];
-          if (insideQuotes && next === '"') { currentValue += '"'; i += 1; }
-          else { insideQuotes = !insideQuotes; }
-          continue;
-        }
-        if (ch === ',' && !insideQuotes) { currentRow.push(currentValue); currentValue = ''; continue; }
-        if ((ch === '\n' || ch === '\r') && !insideQuotes) {
-          if (ch === '\r' && text[i + 1] === '\n') i += 1;
-          currentRow.push(currentValue); rows.push(currentRow); currentRow = []; currentValue = ''; continue;
-        }
-        currentValue += ch;
-      }
-      if (currentValue.length || currentRow.length) { currentRow.push(currentValue); rows.push(currentRow); }
-
-      const cleanedRows = rows
-        .map((row) => row.map((v) => String(v || '').trim()))
-        .filter((row) => row.some((v) => v.length));
-      if (!cleanedRows.length) return [];
-
-      const headers = cleanedRows[0].map((h) => h.replace(/^\uFEFF/, ''));
-      return cleanedRows.slice(1).map((row) => headers.reduce((acc, h, idx) => {
-        acc[h] = row[idx] ?? '';
-        return acc;
-      }, {}));
-    }
-
-    const FIELD_ALIASES = {
-      FamilyID: ['FamilyID', 'Family Id', 'Family ID', 'HouseholdID', 'Household Id', 'Household ID'],
-      FamilyName: ['FamilyName', 'Family Name', 'Household', 'Household Name', 'Invitation Name'],
-      MemberName: ['MemberName', 'Member Name', 'Guest', 'GuestName', 'Guest Name', 'Primary Guest', 'Invitee', 'FullName', 'Full Name', 'Name'],
-      Role: ['Role', 'GuestRole', 'Role Name', 'Guest Role'],
-      GuestsInvited: ['GuestsInvited', 'Guests Invited', 'InvitationCount', 'Invitation Count', 'Invited'],
-      GuestsAttending: ['GuestsAttending', 'Guests Attending', 'Attending Count', 'Attending'],
-      RSVPStatus: ['RSVPStatus', 'RSVP Status', 'Status'],
-      LastUpdated: ['LastUpdated', 'Last Updated', 'Updated'],
-      Notes: ['Notes', 'RSVP Notes', 'Guest Notes'],
-      ContactEmail: ['ContactEmail', 'Contact Email', 'Email', 'Primary Email'],
-      LeadName: ['LeadName', 'Lead Name', 'Primary Contact', 'Head of Household'],
-    };
-
-    function coalesceEntryValue(entry, keys) {
-      for (let i = 0; i < keys.length; i += 1) {
-        const key = keys[i];
-        if (Object.prototype.hasOwnProperty.call(entry, key)) {
-          const value = entry[key];
-          if (value != null) {
-            const text = String(value).trim();
-            if (text) return text;
-          }
-        }
-      }
-      return '';
-    }
-
-    function normalizeEntry(entry) {
-      const normalized = { ...entry };
-      Object.entries(FIELD_ALIASES).forEach(([target, aliases]) => {
-        const value = coalesceEntryValue(entry, aliases);
-        normalized[target] = value || normalized[target] || '';
-      });
-      return normalized;
-    }
-
-    function normalizeEntries(entries) {
-      if (!Array.isArray(entries)) return [];
-      return entries.map((entry) => normalizeEntry(entry));
-    }
-
-    function buildFamilySummaries(entries) {
-      return entries.reduce((families, entry) => {
-        const familyId = normalize(entry.FamilyID || entry.FamilyName || '');
-        const key = normalizeName(familyId);
-        if (!families[key]) {
-          families[key] = {
-            id: entry.FamilyID || '',
-            name: entry.FamilyName || 'Unnamed Family',
-            invited: Number(entry.GuestsInvited || 0),
-            attending: Number(entry.GuestsAttending || 0),
-            status: entry.RSVPStatus || 'Pending',
-            updated: entry.LastUpdated || '',
-            notes: entry.Notes || '',
-            contactEmail: entry.ContactEmail || '',
-            leadName: entry.LeadName || '',
-            members: [],
-          };
-        }
-        const family = families[key];
-        const memberName = normalize(entry.MemberName);
-        if (memberName && !family.members.includes(memberName)) {
-          family.members.push(memberName);
-        }
-        if ((entry.Role || '').toLowerCase() === 'lead') {
-          family.leadName = memberName || family.leadName;
-          family.status = entry.RSVPStatus || family.status;
-          family.attending = Number(entry.GuestsAttending || family.attending || 0);
-          family.updated = entry.LastUpdated || family.updated;
-          family.notes = entry.Notes || family.notes;
-          family.contactEmail = entry.ContactEmail || family.contactEmail;
-        }
-        return families;
-      }, {});
-    }
-
-    function setEligibility(status, message) {
-      if (!eligibilityMessage) return;
-      eligibilityMessage.dataset.status = status;
-      eligibilityMessage.textContent = message;
-    }
-
-    function setFormEnabled(enabled) {
-      if (!formDetails) return;
-
-      [emailField, submitButton].forEach((f) => { if (f) f.disabled = !enabled; });
-      if (emailField) emailField.required = enabled;
-
-      formDetails.querySelectorAll('input[type="radio"][name="Attendance"]').forEach((r) => {
-        r.disabled = !enabled;
-        if (!enabled) r.checked = false;
-      });
-
-      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((c) => {
-        c.disabled = !enabled;
-        if (!enabled) c.checked = false;
-      });
-
-      if (!enabled) attendingNamesField.value = '';
-    }
-
-    function showFamilySummary(family) {
-      if (!family) {
-        familySummary.classList.add('is-hidden');
-        familySummaryTitle.textContent = '';
-        familySummaryCount.textContent = '';
-        familySummaryMembers.textContent = '';
-        return;
-      }
-
-      familySummary.classList.remove('is-hidden');
-      familySummaryTitle.textContent = `${family.name}`;
-      const invited = Number(family.invited || 0);
-      familySummaryCount.textContent = invited
-        ? `Invitation covers ${invited} guest${invited === 1 ? '' : 's'}.`
-        : 'Invitation guest count unavailable.';
-
-      const members = family.members.filter(Boolean);
-      familySummaryMembers.textContent = members.length
-        ? `Family members on this invitation: ${members.join(', ')}.`
-        : '';
-    }
-
-    function showSubmissionLock(message) {
-      submissionLock.classList.remove('is-hidden');
-      submissionLock.textContent = message;
-      formDetails.classList.add('is-hidden');
-      setFormEnabled(false);
-    }
-    function hideSubmissionLock() { submissionLock.classList.add('is-hidden'); }
-
-    function renderAttendanceSelector(family, selected = []) {
-      attendanceCheckboxes.innerHTML = '';
-      if (!family) return;
-
-      const members = family.members.filter(Boolean);
-      if (!members.length && currentGuest) members.push(currentGuest.MemberName);
-
-      const normalizedSelected = new Set(selected.map((n) => normalizeName(n)));
-      members.forEach((member) => {
-        const option = document.createElement('label');
-        option.className = 'attendee-option';
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = member;
-        checkbox.checked = normalizedSelected.size ? normalizedSelected.has(normalizeName(member)) : true;
-        option.appendChild(checkbox);
-        option.appendChild(document.createTextNode(member));
-        attendanceCheckboxes.appendChild(option);
-      });
-
-      refreshAttendingNames();
-      setTimeout(() => {
-        const notAttending = formDetails.querySelector('input[name="Attendance"][value="Not Attending"]');
-        if (notAttending && notAttending.checked) toggleAttendanceCheckboxes(true);
-      }, 0);
-    }
-
-    function refreshAttendingNames() {
-      const selected = Array.from(attendanceCheckboxes.querySelectorAll('input[type="checkbox"]:checked'))
-        .map((c) => normalize(c.value)).filter(Boolean);
-      attendingNamesField.value = selected.join(', ');
-    }
-
-    function toggleAttendanceCheckboxes(disable) {
-      attendanceCheckboxes.querySelectorAll('input[type="checkbox"]').forEach((c) => {
-        c.disabled = disable;
-        if (disable) c.checked = false;
-        else if (!attendingNamesField.value) c.checked = true;
-      });
-      if (disable) attendingNamesField.value = ''; else refreshAttendingNames();
-    }
-
-    function isFamilyLocked(family) {
-      if (!family) return false;
-      const status = normalizeName(family.status);
-      return Boolean(status && status !== 'pending');
-    }
-
-    function findGuestByName(name) {
-      if (!name) return null;
-      const n = normalizeName(name);
-      return guestEntries.find((e) => normalizeName(e.MemberName) === n) || null;
-    }
-
-    function findFamilyLead(familyId) {
-      const id = normalizeName(familyId);
-      return guestEntries.find((e) => normalizeName(e.FamilyID) === id && normalizeName(e.Role) === 'lead');
-    }
-
-    function handleSelection(nameFromInput) {
-      const rawName = normalize(nameFromInput);
-      const ownerOverride = isOwnerName(rawName);
-
-      if (!guestEntries.length) {
-        if (guestListFailed) {
-          setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
-        } else if (guestListLoaded) {
-          setEligibility('info', 'The guest list is currently empty. Please reach out to Patricia & Mark if you need assistance.');
-        } else if (ownerOverride) {
-          setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
-        } else {
-          setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
-        }
-        return;
-      }
-
-      if (!rawName) {
-        currentGuest = null;
-        nameField.value = '';
-        familyIdField.value = '';
-        if (leadNameField) leadNameField.value = '';
-        attendingNamesField.value = '';
-        setEligibility('checking', 'Start typing your name to find your invitation.');
-        familySummary.classList.add('is-hidden');
-        formDetails.classList.add('is-hidden');
-        hideSubmissionLock();
-        return;
-      }
-
-      const guest = findGuestByName(rawName);
-      if (!guest && !ownerOverride) {
-        setEligibility('error', 'We could not find your name on the guest list. Double-check the spelling or contact Patricia & Mark.');
-        familySummary.classList.add('is-hidden');
-        formDetails.classList.add('is-hidden');
-        hideSubmissionLock();
-        if (leadNameField) leadNameField.value = '';
-        return;
-      }
-
-      if (!guest && ownerOverride) {
-        setEligibility('info', `Welcome ${rawName}! Use the search results to pick a family so you can submit an RSVP on their behalf.`);
-        familySummary.classList.add('is-hidden');
-        formDetails.classList.add('is-hidden');
-        hideSubmissionLock();
-        if (leadNameField) leadNameField.value = '';
-        return;
-      }
-
-      const family = getFamilySummaryForGuest(guest);
-      currentGuest = { ...guest, __owner: ownerOverride };
-      nameField.value = guest.MemberName || rawName;
-      familyIdField.value = guest.FamilyID || '';
-      if (leadNameField) leadNameField.value = '';
-
-      showFamilySummary(family);
-      hideSubmissionLock();
-
-      const isLead = ownerOverride || normalizeName(guest.Role) === 'lead';
-      const familyLead = isLead ? guest : findFamilyLead(guest.FamilyID);
-      const leadName = familyLead?.MemberName || familyLead?.LeadName || guest.LeadName || '';
-      if (leadNameField) leadNameField.value = leadName || '';
-
-      if (!isLead) {
-        setEligibility('info', `Hi ${guest.MemberName}! Please ask ${leadName || 'your family lead'} to submit the RSVP for your family.`);
-        formDetails.classList.add('is-hidden');
-        setFormEnabled(false);
-        return;
-      }
-
-      const locked = isFamilyLocked(family);
-      if (locked && !ownerOverride) {
-        const dateText = family?.updated ? ` on ${family.updated}` : '';
-        showSubmissionLock(`Hi ${guest.MemberName}! We already received the RSVP for the ${family?.name || 'family'}${dateText}. For any changes in attendance, please contact Patricia & Mark directly.`);
-        setEligibility('info', 'This RSVP has already been submitted. Reach out to Patricia & Mark if anything needs to be updated.');
-        return;
-      }
-
-      let welcomeMessage = ownerOverride && normalizeName(guest.Role) !== 'lead'
-        ? `Welcome ${guest.MemberName}! You have admin access to submit the RSVP for the ${family?.name || 'family'}.`
-        : `Welcome ${guest.MemberName}! You can submit the RSVP for the ${family?.name || 'family'}.`;
-
-      if (ownerOverride && normalizeName(guest.Role) !== 'lead' && leadName) {
-        welcomeMessage += ` The listed family lead is ${leadName}.`;
-      }
-
-      setEligibility('ok', welcomeMessage);
-
-      formDetails.classList.remove('is-hidden');
-      formDetails.querySelectorAll('input[name="Attendance"]').forEach((r) => { r.checked = false; });
-      if (emailField) emailField.value = '';
-      setFormEnabled(true);
-      renderAttendanceSelector(family);
-    }
-
-    function renderSearchMatches(query) {
-      if (!searchResults) return;
-
-      const trimmed = normalize(query);
-      if (!trimmed || !guestEntries.length) {
-        searchResults.classList.remove('is-visible');
-        searchResults.innerHTML = '';
-        return;
-      }
-
-      const matches = guestEntries
-        .filter((e) => normalizeName(e.MemberName).includes(normalizeName(trimmed)))
-        .slice(0, 10);
-
-      if (!matches.length) {
-        searchResults.classList.remove('is-visible');
-        searchResults.innerHTML = '';
-        return;
-      }
-
-      searchResults.innerHTML = '';
-      matches.forEach((m) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'search-result';
-        btn.dataset.name = m.MemberName || '';
-        btn.innerHTML = `
-          <strong>${m.MemberName}</strong>
-          <small>${m.FamilyName || 'Family invitation'}</small>
-        `;
-        btn.addEventListener('click', () => {
-          searchInput.value = m.MemberName || '';
-          searchResults.classList.remove('is-visible');
-          handleSelection(m.MemberName || '');
-        });
-        searchResults.appendChild(btn);
-      });
-      searchResults.classList.add('is-visible');
-    }
-
-    function handleGuestData(entries) {
-      const filteredEntries = Array.isArray(entries)
-        ? entries.filter((e) => normalize(e.MemberName))
-        : [];
-      guestListLoaded = true;
-      guestListFailed = false;
-      guestEntries = filteredEntries;
-      familySummaries = buildFamilySummaries(filteredEntries);
-      renderSearchMatches(searchInput.value);
-      if (!filteredEntries.length) {
-        setEligibility('info', 'The guest list is currently empty. Please reach out to Patricia & Mark if you have questions.');
-      } else if (searchInput.value) {
-        handleSelection(searchInput.value);
-      }
-    }
-
-    if (attendanceCheckboxes) {
-      attendanceCheckboxes.addEventListener('change', (e) => {
-        if (e.target && e.target.matches('input[type="checkbox"]')) refreshAttendingNames();
+(() => {
+  /******** CONFIG ********/
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec'; // e.g. https://script.google.com/macros/s/XXXX/exec
+  const CASE_INSENSITIVE = true;
+
+  /******** Elements ********/
+  const formWrapper   = document.querySelector('.rsvp-form');
+  const form          = document.getElementById('rsvp-form');
+  const searchInput   = document.getElementById('guest-search');
+  const resultsBox    = document.getElementById('guest-results'); // kept for UI parity (optional)
+  const statusBanner  = document.getElementById('eligibility-message');
+  const famBox        = document.getElementById('family-summary');
+  const famTitle      = document.getElementById('family-summary-title');
+  const famCount      = document.getElementById('family-summary-count');
+  const famMembers    = document.getElementById('family-summary-members');
+  const lockBanner    = document.getElementById('submission-lock');
+  const formDetails   = document.getElementById('form-details');
+  const notesField    = document.getElementById('notes');
+  const rowsContainer = document.getElementById('attendance-rows');
+  const submitBtn     = document.getElementById('rsvp-submit');
+
+  /******** State ********/
+  let currentFamily = null;
+  const ownerOverrides = new Set();
+
+  // pick up admin names from data-owner-names and optional global override list
+  (function loadOwnerOverrides() {
+    if (formWrapper && formWrapper.dataset.ownerNames) {
+      formWrapper.dataset.ownerNames.split('|').forEach(n => {
+        const v = String(n || '').trim().toLowerCase();
+        if (v) ownerOverrides.add(v);
       });
     }
-
-    if (attendanceOptions) {
-      attendanceOptions.addEventListener('change', (e) => {
-        if (e.target && e.target.matches('input[type="radio"][name="Attendance"]')) {
-          const notAttending = e.target.value === 'Not Attending' && e.target.checked;
-          toggleAttendanceCheckboxes(notAttending);
-        }
-      });
-    }
-
-    if (searchInput) {
-      searchInput.addEventListener('input', () => renderSearchMatches(searchInput.value));
-      searchInput.addEventListener('blur', () => setTimeout(() => searchResults.classList.remove('is-visible'), 150));
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          searchResults.classList.remove('is-visible');
-          handleSelection(searchInput.value);
-        }
-      });
-      searchInput.addEventListener('change', () => handleSelection(searchInput.value));
-    }
-
-    function showGuestListError(message, statusMessage) {
-      guestListFailed = true;
-      guestListLoaded = false;
-      guestEntries = [];
-      familySummaries = {};
-      const text = message || 'We could not load the guest list right now. Please refresh the page or try again later.';
-      setEligibility('error', text);
-      if (searchResults) {
-        searchResults.classList.remove('is-visible');
-        searchResults.innerHTML = '';
-      }
-    }
-
-    function extractGuestRows(payload) {
-      if (!payload) return [];
-      if (Array.isArray(payload)) return payload;
-      if (Array.isArray(payload.rows)) return payload.rows;
-      if (Array.isArray(payload.data)) return payload.data;
-      if (Array.isArray(payload.values)) return payload.values;
-      if (Array.isArray(payload.guests)) return payload.guests;
-      if (payload.result && Array.isArray(payload.result.rows)) return payload.result.rows;
-      if (payload.result && Array.isArray(payload.result)) return payload.result;
-      return [];
-    }
-
-    function requestGuestListFromJson() {
-      if (!guestListEndpoint) return Promise.reject(new Error('No guest list JSON endpoint configured.'));
-      return fetch(guestListEndpoint, { method: 'GET' })
-        .then((res) => {
-          if (!res.ok) throw new Error(`Guest list endpoint error: ${res.status}`);
-          return res.json();
-        })
-        .then((payload) => {
-          if (payload && payload.status && payload.status !== 'ok') {
-            throw new Error(payload.message || 'Guest list endpoint reported an error.');
-          }
-          const rows = normalizeEntries(extractGuestRows(payload));
-          if (!rows.length) {
-            throw new Error('Guest list endpoint returned no guest rows.');
-          }
-          return rows;
-        });
-    }
-
-    function requestGuestListFromCsv() {
-      if (!RSVP_CSV_URL) return Promise.reject(new Error('No guest list CSV configured.'));
-      return fetch(RSVP_CSV_URL)
-        .then((res) => {
-          if (!res.ok) throw new Error('Unable to load RSVP data.');
-          return res.text();
-        })
-        .then((text) => {
-          const rows = normalizeEntries(parseCSV(text));
-          if (!rows.length) {
-            throw new Error('Guest list CSV did not include any rows.');
-          }
-          return rows;
-        });
-    }
-
-    function loadGuestListData() {
-      guestListFailed = false;
-      guestListLoaded = false;
-      const loaders = [];
-      if (guestListEndpoint) loaders.push(requestGuestListFromJson);
-      if (RSVP_CSV_URL) loaders.push(requestGuestListFromCsv);
-
-      if (!loaders.length) {
-        showGuestListError('The guest list is not configured yet. Please contact Patricia & Mark for assistance.');
-        return;
-      }
-
-      let current = 0;
-      const tryNext = () => {
-        if (current >= loaders.length) {
-          showGuestListError();
-          return;
-        }
-        const loader = loaders[current];
-        current += 1;
-        loader()
-          .then((rows) => {
-            handleGuestData(rows);
-          })
-          .catch((error) => {
-            console.error('Guest list load failed', error);
-            tryNext();
-          });
-      };
-
-      tryNext();
-    }
-
-    setFormEnabled(false);
-
-    loadGuestListData();
-
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        if (!currentGuest) {
-          e.preventDefault();
-          setEligibility('error', 'Please select your name from the guest list before submitting.');
-          return;
-        }
-
-        const isLead = normalizeName(currentGuest.Role) === 'lead';
-        const isOwner = Boolean(currentGuest.__owner);
-        if (!isLead && !isOwner) {
-          e.preventDefault();
-          setEligibility('error', 'Only the designated family lead or a site admin can submit the RSVP.');
-          return;
-        }
-
-        const selectedAttendance = formDetails.querySelector('input[name="Attendance"]:checked');
-        if (!selectedAttendance) {
-          e.preventDefault();
-          setEligibility('error', 'Please select an attendance option before submitting.');
-          return;
-        }
-
-        const notAttendingSelected = selectedAttendance.value === 'Not Attending';
-        if (!notAttendingSelected && !attendingNamesField.value) {
-          e.preventDefault();
-          setEligibility('error', 'Select who will be attending before submitting your RSVP.');
-          return;
-        }
-
-        e.preventDefault();
-        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-          .then(() => {
-            alert('Thank you for your RSVP!');
-            handleSelection(searchInput.value);
-          })
-          .catch((error) => {
-            console.error('Error!', error.message);
-            setEligibility('error', 'Something went wrong while submitting. Please try again.');
-          });
+    if (Array.isArray(window.RSVP_OWNER_OVERRIDES)) {
+      window.RSVP_OWNER_OVERRIDES.forEach(n => {
+        const v = String(n || '').trim().toLowerCase();
+        if (v) ownerOverrides.add(v);
       });
     }
   })();
+
+  /******** Utils ********/
+  const norm = s => String(s || '').trim();
+  const normName = s => norm(s).toLowerCase();
+
+  function setBanner(kind, msg) {
+    statusBanner.dataset.status = kind;
+    statusBanner.textContent = msg;
+  }
+
+  function showLock(msg) {
+    lockBanner.classList.remove('is-hidden');
+    lockBanner.textContent = msg || 'This family’s RSVP is already submitted.';
+    formDetails.classList.add('is-hidden');
+    submitBtn.disabled = true;
+  }
+  function hideLock() { lockBanner.classList.add('is-hidden'); }
+
+  function setFormEnabled(enabled) { submitBtn.disabled = !enabled; }
+
+  function showFamily(f) {
+    famBox.classList.remove('is-hidden');
+    famTitle.textContent = `${f.leadName} — Family ID: ${f.familyId}`;
+    const members = f.members || [];
+    famCount.textContent = `Members on this invitation: ${members.length}`;
+    famMembers.textContent = members.join(', ');
+  }
+  function hideFamily() {
+    famBox.classList.add('is-hidden');
+    famTitle.textContent = '';
+    famCount.textContent = '';
+    famMembers.textContent = '';
+  }
+
+  function renderMemberRows(family) {
+    rowsContainer.innerHTML = '';
+    (family.members || []).forEach(name => {
+      const row = document.createElement('div');
+      row.className = 'attendee-row';
+
+      const left = document.createElement('div');
+      left.className = 'attendee-name';
+      left.textContent = name;
+
+      const sel = document.createElement('select');
+      sel.className = 'attendee-select';
+      sel.innerHTML = `
+        <option value="yes">Attending</option>
+        <option value="no">Not attending</option>
+      `;
+
+      row.dataset.name = name;
+      row.append(left, sel);
+      rowsContainer.appendChild(row);
+    });
+  }
+
+  async function apiGetFamily(lead) {
+    const url = API_BASE + `?action=getFamily&lead=${encodeURIComponent(lead)}`;
+    const res = await fetch(url, { method: 'GET' });
+    return res.json();
+  }
+
+  async function apiSubmit(payload) {
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  }
+
+  function canSubmitFor(family, typedName) {
+    const isLead = CASE_INSENSITIVE
+      ? normName(family.leadName) === normName(typedName)
+      : norm(family.leadName) === norm(typedName);
+    return isLead || ownerOverrides.has(normName(typedName));
+  }
+
+  function collectStatuses() {
+    return [...rowsContainer.children].map(row => {
+      const name = row.dataset.name;
+      const attending = row.querySelector('select').value === 'yes';
+      return { name, attending };
+    });
+  }
+
+  /******** Search + Load ********/
+  async function handleSearch(typed) {
+    const q = norm(typed);
+    if (!q) {
+      setBanner('checking', 'Type the family lead’s full name, then press Enter.');
+      hideFamily(); hideLock(); setFormEnabled(false);
+      formDetails.classList.add('is-hidden');
+      currentFamily = null;
+      return;
+    }
+
+    setBanner('checking', 'Looking up your family invitation…');
+    hideLock(); setFormEnabled(false); formDetails.classList.add('is-hidden');
+
+    try {
+      const resp = await apiGetFamily(q);
+      if (!resp.ok) {
+        setBanner('error', resp.error || 'Lead not found. Please check spelling or contact the couple.');
+        hideFamily(); currentFamily = null;
+        return;
+      }
+
+      const fam = resp.data || {};
+      currentFamily = fam;
+      showFamily(fam);
+
+      if (fam.submitted) {
+        showLock('This family’s RSVP has already been submitted. Please contact the couple for any changes.');
+        setBanner('info', 'RSVP already submitted.');
+        return;
+      }
+
+      if (!canSubmitFor(fam, q)) {
+        setBanner('info', `Only the designated family lead (${fam.leadName}) can submit the RSVP.`);
+        formDetails.classList.add('is-hidden');
+        return;
+      }
+
+      // Render form for lead / admin
+      setBanner('ok', `Welcome ${fam.leadName}! Please confirm each member below.`);
+      renderMemberRows(fam);
+      formDetails.classList.remove('is-hidden');
+      setFormEnabled(true);
+    } catch (err) {
+      console.error(err);
+      setBanner('error', 'Something went wrong while loading. Please try again or contact the couple.');
+      hideFamily(); hideLock();
+      currentFamily = null;
+    }
+  }
+
+  // Press Enter to search; blur also triggers.
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleSearch(searchInput.value); }
+  });
+  searchInput.addEventListener('change', () => handleSearch(searchInput.value));
+  // optional: hide suggestions panel if present
+  searchInput.addEventListener('blur', () => setTimeout(() => resultsBox?.classList?.remove('is-visible'), 150));
+
+  /******** Submit ********/
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentFamily) { setBanner('error', 'Please look up the lead name first.'); return; }
+
+    const typedName = norm(searchInput.value);
+    if (!canSubmitFor(currentFamily, typedName)) {
+      setBanner('error', `Only ${currentFamily.leadName} (or an admin) can submit this RSVP.`);
+      return;
+    }
+
+    const statuses = collectStatuses();
+    if (!statuses.length) { setBanner('error', 'No members to submit.'); return; }
+
+    submitBtn.disabled = true;
+    try {
+      const payload = {
+        familyId: currentFamily.familyId,
+        leadName: currentFamily.leadName,
+        notes: norm(notesField.value),
+        statuses
+      };
+      const resp = await apiSubmit(payload);
+
+      if (!resp.ok) {
+        if (resp.locked) {
+          showLock(resp.message || 'This family’s RSVP is already submitted.');
+          setBanner('info', 'RSVP already submitted.');
+        } else {
+          setBanner('error', resp.error || 'Unable to submit. Please try again.');
+          submitBtn.disabled = false;
+        }
+        return;
+      }
+
+      setBanner('ok', 'RSVP submitted. Thank you!');
+      showLock('RSVP submitted. If anything changes, please contact the couple.');
+    } catch (err) {
+      console.error(err);
+      setBanner('error', 'Submission failed. Please try again or contact the couple.');
+      submitBtn.disabled = false;
+    }
+  });
+})();
 </script>
