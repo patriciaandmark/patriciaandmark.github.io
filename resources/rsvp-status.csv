@@ -1,0 +1,5 @@
+FamilyID,FamilyName,ContactEmail,GuestsInvited,GuestsAttending,RSVPStatus,LastUpdated,Notes
+FAM-001,Santos Family,santos@example.com,5,5,Confirmed,2024-05-01,All attending
+FAM-002,Reyes Family,reyes@example.com,3,0,Pending,,Awaiting confirmation
+FAM-003,Luna Family,luna@example.com,4,2,Confirmed,2024-05-02,Traveling separately
+FAM-004,Garcia Family,garcia@example.com,2,0,Declined,2024-04-28,Sent their love

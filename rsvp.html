@@ -1,20 +1,32 @@
 <h2>RSVP</h2>
 <style>
-  .rsvp-form {
+  .rsvp-layout {
+    display: grid;
+    gap: 2rem;
+    margin: 2rem auto;
+    max-width: 1100px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+
+  .rsvp-form,
+  .rsvp-status {
     background: #fff;
     padding: 2rem;
     border-radius: 12px;
-    max-width: 500px;
-    margin: 2rem auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  .rsvp-form {
     text-align: left;
   }
+
   .rsvp-form label {
     display: block;
     margin-top: 1rem;
     font-weight: 600;
     color: #5e524b;
   }
+
   .rsvp-form input[type="text"],
   .rsvp-form input[type="email"] {
     width: 100%;
@@ -24,15 +36,18 @@
     border: 1px solid #ccc;
     font-family: 'Inter', sans-serif;
   }
+
   .rsvp-form .options {
     margin-top: 1rem;
   }
+
   .rsvp-form .options label {
     font-weight: normal;
     display: block;
     margin-left: 1rem;
     margin-top: 0.5rem;
   }
+
   .rsvp-form button {
     margin-top: 1.5rem;
     width: 100%;
@@ -45,40 +60,238 @@
     cursor: pointer;
     transition: background 0.3s;
   }
+
   .rsvp-form button:hover {
     background-color: #b3a69c;
   }
+
+  .rsvp-status h3 {
+    margin-top: 0;
+    color: #5e524b;
+  }
+
+  .status-summary {
+    background: #f7f1ed;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #5e524b;
+    line-height: 1.6;
+  }
+
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .status-table th,
+  .status-table td {
+    text-align: left;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #eee;
+    color: #5e524b;
+  }
+
+  .status-table th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7a6d64;
+  }
+
+  .status-chip {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status-chip[data-status="Confirmed"] {
+    background: rgba(73, 160, 120, 0.15);
+    color: #2e6b4f;
+  }
+
+  .status-chip[data-status="Pending"] {
+    background: rgba(255, 193, 7, 0.2);
+    color: #8a6d00;
+  }
+
+  .status-chip[data-status="Declined"] {
+    background: rgba(220, 53, 69, 0.15);
+    color: #a12635;
+  }
+
+  .status-updated {
+    font-size: 0.75rem;
+    color: #9b9087;
+  }
+
+  .status-error {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #a12635;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
 </style>
 
-<div class="rsvp-form">
-  <form name="submit-to-google-sheet">
-    <label for="name">Name</label>
-    <input name="Name" type="text" id="name" placeholder="Your full name" required>
+<div class="rsvp-layout">
+  <div class="rsvp-form">
+    <form name="submit-to-google-sheet">
+      <label for="name">Name</label>
+      <input name="Name" type="text" id="name" placeholder="Your full name" required>
 
-    <label for="email">Email</label>
-    <input name="Email" type="email" id="email" placeholder="you@example.com" required>
+      <label for="email">Email</label>
+      <input name="Email" type="email" id="email" placeholder="you@example.com" required>
 
-    <label>Will you be attending?</label>
-    <div class="options">
-      <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label>
-      <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label>
-      <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label>
-      <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label>
-    </div>
+      <label>Will you be attending?</label>
+      <div class="options">
+        <label><input type="radio" name="Attendance" value="Ceremony Only" required> Ceremony Only</label>
+        <label><input type="radio" name="Attendance" value="Reception Only"> Reception Only</label>
+        <label><input type="radio" name="Attendance" value="Ceremony and Reception"> Ceremony and Reception</label>
+        <label><input type="radio" name="Attendance" value="Not Attending"> Not Attending</label>
+      </div>
 
-    <button type="submit">Send RSVP</button>
-  </form>
+      <button type="submit">Send RSVP</button>
+    </form>
+  </div>
+
+  <div class="rsvp-status" id="rsvp-status">
+    <h3>Family RSVP Status</h3>
+    <p class="status-loading">Loading family updates…</p>
+  </div>
 </div>
 
 <script>
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
   const form = document.forms['submit-to-google-sheet'];
   if (form) {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => alert("Thank you for your RSVP!"))
-        .catch(error => console.error('Error!', error.message));
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+        .then(() => alert('Thank you for your RSVP!'))
+        .catch((error) => console.error('Error!', error.message));
     });
   }
+
+  const RSVP_CSV_URL = 'resources/rsvp-status.csv';
+
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/).filter(Boolean);
+    if (!rows.length) {
+      return [];
+    }
+
+    const headers = rows[0].split(',').map((header) => header.trim());
+    return rows.slice(1).map((row) => {
+      const values = row.split(',').map((value) => value.trim());
+      return headers.reduce((entry, header, index) => {
+        entry[header] = values[index] ?? '';
+        return entry;
+      }, {});
+    });
+  }
+
+  function renderStatus(data) {
+    const container = document.getElementById('rsvp-status');
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '<h3>Family RSVP Status</h3>';
+
+    if (!data.length) {
+      const emptyState = document.createElement('p');
+      emptyState.textContent = 'No RSVP updates are available yet. Add rows to resources/rsvp-status.csv to populate this section.';
+      container.appendChild(emptyState);
+      return;
+    }
+
+    const totals = data.reduce((acc, family) => {
+      const invited = Number(family.GuestsInvited || 0);
+      const attending = Number(family.GuestsAttending || 0);
+      const responded = (family.RSVPStatus || '').toLowerCase() !== 'pending';
+
+      acc.invited += invited;
+      acc.attending += attending;
+      acc.families += 1;
+      acc.responded += responded ? 1 : 0;
+      return acc;
+    }, { invited: 0, attending: 0, families: 0, responded: 0 });
+
+    const summary = document.createElement('div');
+    summary.className = 'status-summary';
+    summary.innerHTML = `
+      <strong>${totals.responded}</strong> of <strong>${totals.families}</strong> families have responded.<br>
+      <strong>${totals.attending}</strong> guests attending out of <strong>${totals.invited}</strong> invited.
+    `;
+    container.appendChild(summary);
+
+    const table = document.createElement('table');
+    table.className = 'status-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Family</th>
+          <th>Invited</th>
+          <th>Attending</th>
+          <th>Status</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    data.forEach((family) => {
+      const row = document.createElement('tr');
+      const status = family.RSVPStatus || 'Pending';
+
+      row.innerHTML = `
+        <td>
+          <div><strong>${family.FamilyName || 'Unnamed Family'}</strong></div>
+          ${family.ContactEmail ? `<div class="status-updated">${family.ContactEmail}</div>` : ''}
+        </td>
+        <td>${family.GuestsInvited || '—'}</td>
+        <td>${family.GuestsAttending || '—'}</td>
+        <td><span class="status-chip" data-status="${status}">${status}</span></td>
+        <td>
+          ${family.LastUpdated ? `<div class="status-updated">${family.LastUpdated}</div>` : ''}
+          ${family.Notes ? `<div class="status-updated">${family.Notes}</div>` : ''}
+        </td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    container.appendChild(table);
+  }
+
+  function showStatusError(message) {
+    const container = document.getElementById('rsvp-status');
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '<h3>Family RSVP Status</h3>';
+    const error = document.createElement('div');
+    error.className = 'status-error';
+    error.textContent = message;
+    container.appendChild(error);
+  }
+
+  fetch(RSVP_CSV_URL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Unable to load RSVP data.');
+      }
+      return response.text();
+    })
+    .then((text) => renderStatus(parseCSV(text)))
+    .catch(() => {
+      showStatusError('We could not load the latest RSVP information. Please refresh the page or try again later.');
+    });
 </script>
+
