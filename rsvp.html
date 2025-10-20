@@ -357,6 +357,7 @@
 
       <input type="hidden" name="Name" id="name">
       <input type="hidden" name="FamilyID" id="family-id">
+      <input type="hidden" name="LeadName" id="lead-name">
       <input type="hidden" name="AttendingNames" id="attending-names">
     </form>
   </div>
@@ -445,6 +446,7 @@
     const nameField = document.getElementById('name');
     const emailField = document.getElementById('email');
     const familyIdField = document.getElementById('family-id');
+    const leadNameField = document.getElementById('lead-name');
     const attendingNamesField = document.getElementById('attending-names');
     const formDetails = document.getElementById('form-details');
     const familySummary = document.getElementById('family-summary');
@@ -901,6 +903,9 @@
         currentGuest = null;
         nameField.value = '';
         familyIdField.value = '';
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
         attendingNamesField.value = '';
         setEligibility('checking', 'Start typing your name to find your invitation.');
         familySummary.classList.add('is-hidden');
@@ -915,6 +920,9 @@
         familySummary.classList.add('is-hidden');
         formDetails.classList.add('is-hidden');
         hideSubmissionLock();
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
         return;
       }
 
@@ -923,6 +931,9 @@
         familySummary.classList.add('is-hidden');
         formDetails.classList.add('is-hidden');
         hideSubmissionLock();
+        if (leadNameField) {
+          leadNameField.value = '';
+        }
         return;
       }
 
@@ -930,6 +941,9 @@
       currentGuest = { ...guest, __owner: ownerOverride };
       nameField.value = guest.MemberName || rawName;
       familyIdField.value = guest.FamilyID || '';
+      if (leadNameField) {
+        leadNameField.value = '';
+      }
 
       showFamilySummary(family);
       hideSubmissionLock();
@@ -937,6 +951,9 @@
       const isLead = ownerOverride || normalizeName(guest.Role) === 'lead';
       const familyLead = isLead ? guest : findFamilyLead(guest.FamilyID);
       const leadName = familyLead?.MemberName || familyLead?.LeadName || guest.LeadName || '';
+      if (leadNameField) {
+        leadNameField.value = leadName || '';
+      }
 
       if (!isLead) {
         setEligibility('info', `Hi ${guest.MemberName}! Please ask ${leadName || 'your family lead'} to submit the RSVP for your family.`);
