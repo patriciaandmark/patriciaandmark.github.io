@@ -372,6 +372,7 @@
   (() => {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyLpByZwrBppy03kGCcta7IiboopShsWm9B_SRcUCFKAac6PfQHSDFZJuViIHKbI0hY/exec';
     const formContainer = document.querySelector('.rsvp-form');
+    let guestListEndpoint = '';
 
     // --- FIX #1: no default gid; prefer sheetName
     function getSheetConfig() {
@@ -380,6 +381,7 @@
         gid: null,          // <--- was "0"; now null so it won't be used by default
         sheetName: '',
         query: '',
+        guestListEndpoint: '',
       };
 
       if (formContainer) {
@@ -396,6 +398,9 @@
         if (formContainer.dataset.sheetQuery) {
           defaults.query = formContainer.dataset.sheetQuery;
         }
+        if (formContainer.dataset.guestListEndpoint) {
+          defaults.guestListEndpoint = formContainer.dataset.guestListEndpoint;
+        }
       }
 
       if (window.RSVP_SHEET_CONFIG && typeof window.RSVP_SHEET_CONFIG === 'object') {
@@ -407,6 +412,7 @@
         }
         if (overrides.sheetName) defaults.sheetName = overrides.sheetName;
         if (typeof overrides.query === 'string') defaults.query = overrides.query;
+        if (overrides.guestListEndpoint) defaults.guestListEndpoint = overrides.guestListEndpoint;
       }
 
       return defaults;
@@ -433,7 +439,8 @@
 
     const SHEET_CONFIG = getSheetConfig();
     const RSVP_CSV_URL = buildSheetCsvUrl(SHEET_CONFIG);
-    console.log('RSVP_CSV_URL:', RSVP_CSV_URL); // sanity check
+    const endpointFromConfig = normalize(SHEET_CONFIG.guestListEndpoint);
+    guestListEndpoint = endpointFromConfig || (scriptURL ? `${scriptURL}?action=guestList` : '');
 
     const form = document.forms['submit-to-google-sheet'];
     const searchInput = document.getElementById('guest-search');
@@ -457,6 +464,8 @@
     let guestEntries = [];
     let familySummaries = {};
     let currentGuest = null;
+    let guestListLoaded = false;
+    let guestListFailed = false;
 
     function normalize(value) { return String(value || '').trim(); }
     function normalizeName(value) { return normalize(value).toLowerCase(); }
@@ -545,6 +554,48 @@
         acc[h] = row[idx] ?? '';
         return acc;
       }, {}));
+    }
+
+    const FIELD_ALIASES = {
+      FamilyID: ['FamilyID', 'Family Id', 'Family ID', 'HouseholdID', 'Household Id', 'Household ID'],
+      FamilyName: ['FamilyName', 'Family Name', 'Household', 'Household Name', 'Invitation Name'],
+      MemberName: ['MemberName', 'Member Name', 'Guest', 'GuestName', 'Guest Name', 'Primary Guest', 'Invitee', 'FullName', 'Full Name', 'Name'],
+      Role: ['Role', 'GuestRole', 'Role Name', 'Guest Role'],
+      GuestsInvited: ['GuestsInvited', 'Guests Invited', 'InvitationCount', 'Invitation Count', 'Invited'],
+      GuestsAttending: ['GuestsAttending', 'Guests Attending', 'Attending Count', 'Attending'],
+      RSVPStatus: ['RSVPStatus', 'RSVP Status', 'Status'],
+      LastUpdated: ['LastUpdated', 'Last Updated', 'Updated'],
+      Notes: ['Notes', 'RSVP Notes', 'Guest Notes'],
+      ContactEmail: ['ContactEmail', 'Contact Email', 'Email', 'Primary Email'],
+      LeadName: ['LeadName', 'Lead Name', 'Primary Contact', 'Head of Household'],
+    };
+
+    function coalesceEntryValue(entry, keys) {
+      for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        if (Object.prototype.hasOwnProperty.call(entry, key)) {
+          const value = entry[key];
+          if (value != null) {
+            const text = String(value).trim();
+            if (text) return text;
+          }
+        }
+      }
+      return '';
+    }
+
+    function normalizeEntry(entry) {
+      const normalized = { ...entry };
+      Object.entries(FIELD_ALIASES).forEach(([target, aliases]) => {
+        const value = coalesceEntryValue(entry, aliases);
+        normalized[target] = value || normalized[target] || '';
+      });
+      return normalized;
+    }
+
+    function normalizeEntries(entries) {
+      if (!Array.isArray(entries)) return [];
+      return entries.map((entry) => normalizeEntry(entry));
     }
 
     function buildFamilySummaries(entries) {
@@ -776,8 +827,15 @@
       const ownerOverride = isOwnerName(rawName);
 
       if (!guestEntries.length) {
-        if (ownerOverride) setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
-        else setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
+        if (guestListFailed) {
+          setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
+        } else if (guestListLoaded) {
+          setEligibility('info', 'The guest list is currently empty. Please reach out to Patricia & Mark if you need assistance.');
+        } else if (ownerOverride) {
+          setEligibility('ok', `Welcome ${rawName}! You have admin access, please choose a guest once the list finishes loading.`);
+        } else {
+          setEligibility('checking', 'We are still loading the guest list. Please wait a moment.');
+        }
         return;
       }
 
@@ -903,11 +961,17 @@
       const filteredEntries = Array.isArray(entries)
         ? entries.filter((e) => normalize(e.MemberName))
         : [];
+      guestListLoaded = true;
+      guestListFailed = false;
       guestEntries = filteredEntries;
       familySummaries = buildFamilySummaries(filteredEntries);
       renderStatusFromFamilies(Object.values(familySummaries));
       renderSearchMatches(searchInput.value);
-      if (searchInput.value) handleSelection(searchInput.value);
+      if (!filteredEntries.length) {
+        setEligibility('info', 'The guest list is currently empty. Please reach out to Patricia & Mark if you have questions.');
+      } else if (searchInput.value) {
+        handleSelection(searchInput.value);
+      }
     }
 
     if (attendanceCheckboxes) {
@@ -938,40 +1002,110 @@
       searchInput.addEventListener('change', () => handleSelection(searchInput.value));
     }
 
-    setFormEnabled(false);
-
-    if (!RSVP_CSV_URL) {
-      setEligibility('error', 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.');
+    function showGuestListError(message, statusMessage) {
+      guestListFailed = true;
+      guestListLoaded = false;
+      guestEntries = [];
+      familySummaries = {};
+      const text = message || 'We could not load the guest list right now. Please refresh the page or try again later.';
+      setEligibility('error', text);
+      if (searchResults) {
+        searchResults.classList.remove('is-visible');
+        searchResults.innerHTML = '';
+      }
       const container = document.getElementById('rsvp-status');
       if (container) {
         container.innerHTML = '<h3>Family RSVP Status</h3>';
         const error = document.createElement('div');
         error.className = 'status-error';
-        error.textContent = 'The guest list is not configured yet. Please contact Patricia & Mark for assistance.';
+        error.textContent = statusMessage || text;
         container.appendChild(error);
       }
-    } else {
-      fetch(RSVP_CSV_URL)
+    }
+
+    function extractGuestRows(payload) {
+      if (!payload) return [];
+      if (Array.isArray(payload)) return payload;
+      if (Array.isArray(payload.rows)) return payload.rows;
+      if (Array.isArray(payload.data)) return payload.data;
+      if (Array.isArray(payload.values)) return payload.values;
+      if (Array.isArray(payload.guests)) return payload.guests;
+      if (payload.result && Array.isArray(payload.result.rows)) return payload.result.rows;
+      if (payload.result && Array.isArray(payload.result)) return payload.result;
+      return [];
+    }
+
+    function requestGuestListFromJson() {
+      if (!guestListEndpoint) return Promise.reject(new Error('No guest list JSON endpoint configured.'));
+      return fetch(guestListEndpoint, { method: 'GET' })
+        .then((res) => {
+          if (!res.ok) throw new Error(`Guest list endpoint error: ${res.status}`);
+          return res.json();
+        })
+        .then((payload) => {
+          if (payload && payload.status && payload.status !== 'ok') {
+            throw new Error(payload.message || 'Guest list endpoint reported an error.');
+          }
+          const rows = normalizeEntries(extractGuestRows(payload));
+          if (!rows.length) {
+            throw new Error('Guest list endpoint returned no guest rows.');
+          }
+          return rows;
+        });
+    }
+
+    function requestGuestListFromCsv() {
+      if (!RSVP_CSV_URL) return Promise.reject(new Error('No guest list CSV configured.'));
+      return fetch(RSVP_CSV_URL)
         .then((res) => {
           if (!res.ok) throw new Error('Unable to load RSVP data.');
           return res.text();
         })
         .then((text) => {
-          // console.log('CSV preview:', text.slice(0, 200)); // optional debug
-          handleGuestData(parseCSV(text));
-        })
-        .catch(() => {
-          setEligibility('error', 'We could not load the guest list right now. Please refresh the page or try again later.');
-          const container = document.getElementById('rsvp-status');
-          if (container) {
-            container.innerHTML = '<h3>Family RSVP Status</h3>';
-            const error = document.createElement('div');
-            error.className = 'status-error';
-            error.textContent = 'We could not load the latest RSVP information. Please refresh the page or try again later.';
-            container.appendChild(error);
+          const rows = normalizeEntries(parseCSV(text));
+          if (!rows.length) {
+            throw new Error('Guest list CSV did not include any rows.');
           }
+          return rows;
         });
     }
+
+    function loadGuestListData() {
+      guestListFailed = false;
+      guestListLoaded = false;
+      const loaders = [];
+      if (guestListEndpoint) loaders.push(requestGuestListFromJson);
+      if (RSVP_CSV_URL) loaders.push(requestGuestListFromCsv);
+
+      if (!loaders.length) {
+        showGuestListError('The guest list is not configured yet. Please contact Patricia & Mark for assistance.');
+        return;
+      }
+
+      let current = 0;
+      const tryNext = () => {
+        if (current >= loaders.length) {
+          showGuestListError();
+          return;
+        }
+        const loader = loaders[current];
+        current += 1;
+        loader()
+          .then((rows) => {
+            handleGuestData(rows);
+          })
+          .catch((error) => {
+            console.error('Guest list load failed', error);
+            tryNext();
+          });
+      };
+
+      tryNext();
+    }
+
+    setFormEnabled(false);
+
+    loadGuestListData();
 
     if (form) {
       form.addEventListener('submit', (e) => {
