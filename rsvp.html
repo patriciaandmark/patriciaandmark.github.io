@@ -625,6 +625,21 @@
         .then(() => alert('Thank you for your RSVP!'))
         .catch((error) => console.error('Error!', error.message));
     });
+
+    container.appendChild(table);
+  }
+
+  function showStatusError(message) {
+    const container = document.getElementById('rsvp-status');
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '<h3>Family RSVP Status</h3>';
+    const error = document.createElement('div');
+    error.className = 'status-error';
+    error.textContent = message;
+    container.appendChild(error);
   }
 </script>
 
