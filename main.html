@@ -46,11 +46,11 @@
 </head>
 <body>
   <nav>
-    <a href="#" onclick="loadPage('welcome.html')">Welcome</a>
-    <a href="#" onclick="loadPage('our-story.html')">Our Story</a>
-    <a href="#" onclick="loadPage('gallery.html')">Gallery</a>
-    <a href="#" onclick="loadPage('rsvp.html')">RSVP</a>
-    <a href="#" onclick="loadPage('faq.html')">FAQs</a>
+    <a href="#" onclick="return navigateTo('welcome');">Welcome</a>
+    <a href="#" onclick="return navigateTo('our-story');">Our Story</a>
+    <a href="#" onclick="return navigateTo('gallery');">Gallery</a>
+    <a href="#" onclick="return navigateTo('rsvp');">RSVP</a>
+    <a href="#" onclick="return navigateTo('faq');">FAQs</a>
   </nav>
 
   <main id="page-content"></main>
@@ -58,41 +58,139 @@
   <footer>Made with love by Patricia & Mark</footer>
 
   <script>
-    function loadPage(page) {
+    const ROUTES = {
+      'welcome':   { file: 'welcome.html', token: 'c11' },
+      'our-story': { file: 'our-story.html', token: 'a24' },
+      'gallery':   { file: 'gallery.html', token: 'f35' },
+      'rsvp':      { file: 'rsvp.html', token: 'k48' },
+      'faq':       { file: 'faq.html', token: 'q59' }
+    };
+
+    const DEFAULT_ROUTE = 'welcome';
+    let currentRouteKey = null;
+
+    function getRoute(identifier) {
+      if (identifier === null || identifier === undefined) return null;
+      const raw = String(identifier).trim().toLowerCase();
+      if (!raw) return null;
+
+      if (Object.prototype.hasOwnProperty.call(ROUTES, raw)) {
+        const match = ROUTES[raw];
+        return { key: raw, file: match.file, token: match.token };
+      }
+
+      const normalizedFile = raw.endsWith('.html') ? raw : `${raw}.html`;
+      for (const [key, value] of Object.entries(ROUTES)) {
+        if (value.token.toLowerCase() === raw) {
+          return { key, file: value.file, token: value.token };
+        }
+        if (value.file.toLowerCase() === normalizedFile) {
+          return { key, file: value.file, token: value.token };
+        }
+        const fileWithoutExt = value.file.replace(/\.html$/i, '').toLowerCase();
+        if (fileWithoutExt === raw) {
+          return { key, file: value.file, token: value.token };
+        }
+      }
+
+      return null;
+    }
+
+    function executeEmbeddedScripts(container) {
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach((script) => {
+        const newScript = document.createElement('script');
+        if (script.src) {
+          newScript.src = script.src;
+          newScript.defer = script.defer;
+          newScript.async = script.async;
+        } else {
+          newScript.textContent = script.textContent;
+        }
+        document.body.appendChild(newScript);
+        script.remove();
+        if (!newScript.src) {
+          newScript.remove();
+        } else {
+          const cleanup = () => newScript.remove();
+          newScript.addEventListener('load', cleanup, { once: true });
+          newScript.addEventListener('error', cleanup, { once: true });
+        }
+      });
+    }
+
+    function updateHistory(route, replace) {
+      const url = new URL(window.location);
+      const params = new URLSearchParams(url.search);
+      params.delete('page');
+      params.set('v', route.token);
+      const query = params.toString();
+      const targetUrl = query ? `${url.pathname}?${query}` : url.pathname;
+      const method = replace ? 'replaceState' : 'pushState';
+      window.history[method]({ route: route.key }, '', targetUrl);
+    }
+
+    function renderRoute(input, options = {}) {
+      const routeInfo = typeof input === 'string' ? getRoute(input) : input;
+      const route = routeInfo || getRoute(DEFAULT_ROUTE);
+      if (!route) return;
+      if (route.key === currentRouteKey && !options.force) return;
+
       const content = document.getElementById('page-content');
       content.classList.remove('loaded');
-      fetch(page)
-        .then(response => response.text())
-        .then(html => {
+
+      fetch(route.file)
+        .then((response) => response.text())
+        .then((html) => {
           content.innerHTML = html;
-
-          // Run any scripts manually
-          const scripts = content.querySelectorAll("script");
-          scripts.forEach(script => {
-            const newScript = document.createElement("script");
-            if (script.src) {
-              newScript.src = script.src;
-            } else {
-              newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-            script.remove();
-          });
-
+          executeEmbeddedScripts(content);
           setTimeout(() => content.classList.add('loaded'), 50);
           window.scrollTo(0, 0);
+          currentRouteKey = route.key;
+          if (options.updateHistory !== false) {
+            updateHistory(route, Boolean(options.replace));
+          }
         });
     }
 
-    function resolveInitialPage() {
+    function resolveInitialRoute() {
       const params = new URLSearchParams(window.location.search);
-      const target = (params.get('page') || '').trim();
-      if (!target) return 'welcome.html';
-      const allowed = new Set(['welcome', 'our-story', 'gallery', 'rsvp', 'faq']);
-      return allowed.has(target) ? `${target}.html` : 'welcome.html';
+      const token = params.get('v');
+      if (token) {
+        const routeFromToken = getRoute(token);
+        if (routeFromToken) return routeFromToken;
+      }
+
+      const legacy = params.get('page');
+      if (legacy) {
+        const routeFromLegacy = getRoute(legacy);
+        if (routeFromLegacy) return routeFromLegacy;
+      }
+
+      return getRoute(DEFAULT_ROUTE);
     }
 
-    window.onload = () => loadPage(resolveInitialPage());
+    function navigateTo(routeKey) {
+      renderRoute(routeKey);
+      return false;
+    }
+
+    window.navigateTo = navigateTo;
+
+    window.addEventListener('popstate', (event) => {
+      const stateRoute = event.state && event.state.route;
+      if (stateRoute) {
+        renderRoute(stateRoute, { updateHistory: false, force: true });
+      } else {
+        const resolved = resolveInitialRoute();
+        renderRoute(resolved ? resolved.key : DEFAULT_ROUTE, { updateHistory: false, replace: true, force: true });
+      }
+    });
+
+    window.addEventListener('load', () => {
+      const initial = resolveInitialRoute();
+      renderRoute(initial ? initial.key : DEFAULT_ROUTE, { replace: true, force: true });
+    });
   </script>
 </body>
 </html>
