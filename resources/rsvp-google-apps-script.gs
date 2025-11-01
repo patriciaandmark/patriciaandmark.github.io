@@ -1,286 +1,180 @@
-/**
- * Google Apps Script that powers the Patricia & Mark RSVP workflow.
- *
- * The site submits RSVPs with fields Name, Email, Attendance, FamilyID,
- * LeadName, and AttendingNames. The script stores the raw submission in a
- * "FormResponses" tab and updates the authoritative guest list that lives in
- * the "GuestList" tab. A GET request with ?action=guestList returns the
- * current guest list as JSON for the static site.
- */
-const SHEET_ID = '1keeUUKuJ4uabjNtHy2bYq2nKt6_ZR3VPX6Dp57Lj9cw';
-const GUEST_LIST_TAB = 'GuestList';
-const RESPONSES_TAB = 'FormResponses';
+/**** CONFIG ****/
+const SPREADSHEET_ID = '1dHKdsnTTpVUuyx9EJoGNiEgZs9cBU-7gneRI8xgFELg';
+const SHEET_ROSTER = 'Roster';
+const SHEET_RESPONSES = 'Responses';
 
-const RESPONSE_HEADERS = [
-  'Timestamp',
-  'FamilyID',
-  'LeadName',
-  'SubmittedBy',
-  'Email',
-  'Attendance',
-  'Status',
-  'AttendingNames',
-  'RawPayload',
-];
+// Toggle to be permissive on name matching (case-insensitive, trims spaces)
+const CASE_INSENSITIVE = true;
 
+/**** HELPERS ****/
+function _open() {
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
+function _getSheet(name) {
+  const ss = _open();
+  const sh = ss.getSheetByName(name);
+  if (!sh) throw new Error(`Missing sheet "${name}"`);
+  return sh;
+}
+
+function _nowISO() {
+  return new Date();
+}
+
+function _parseMembers(cell) {
+  if (!cell) return [];
+  // members separated by semicolons or newlines
+  return String(cell)
+    .split(/[;\n]/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function _readRoster() {
+  const sh = _getSheet(SHEET_ROSTER);
+  const values = sh.getDataRange().getValues();
+  const headers = values.shift();
+  const idx = Object.fromEntries(headers.map((h, i) => [String(h).trim(), i]));
+
+  return values.map(row => ({
+    rowIndex: values.indexOf(row) + 2, // add header row offset
+    FamilyID: row[idx['FamilyID']],
+    LeadName: row[idx['LeadName']],
+    LeadEmail: row[idx['LeadEmail']],
+    Members: _parseMembers(row[idx['Members']]),
+    Submitted: String(row[idx['Submitted']] || '').toString().toUpperCase() === 'TRUE',
+    SubmittedAt: row[idx['SubmittedAt']] || ''
+  }));
+}
+
+function _writeSubmitLock(rowIndex) {
+  const sh = _getSheet(SHEET_ROSTER);
+  // Columns: Submitted (E), SubmittedAt (F) in template
+  sh.getRange(rowIndex, 5).setValue(true);
+  sh.getRange(rowIndex, 6).setValue(_nowISO());
+}
+
+function _appendResponses(familyID, leadName, notes, statuses) {
+  const sh = _getSheet(SHEET_RESPONSES);
+  // Ensure headers exist
+  if (sh.getLastRow() === 0) {
+    sh.appendRow(['Timestamp', 'FamilyID', 'PersonName', 'Attending', 'SubmittedBy', 'Notes']);
+  }
+  const ts = _nowISO();
+  const rows = statuses.map(s => [ts, familyID, s.name, s.attending ? 'Yes' : 'No', leadName, notes || '']);
+  sh.getRange(sh.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+}
+
+/**** API ****/
+// GET  /?action=getFamily&lead=Mariel%20Jabillo
 function doGet(e) {
   try {
-    const action = ((e && e.parameter && e.parameter.action) || '').toString().toLowerCase();
-    if (!action || action === 'guestlist' || action === 'guest-list') {
-      const ss = SpreadsheetApp.openById(SHEET_ID);
-      const guestSheet = getRequiredSheet(ss, GUEST_LIST_TAB);
-      const rows = getGuestListRows(guestSheet);
-      return jsonResponse({ status: 'ok', rows: rows });
+    const action = (e.parameter.action || '').trim();
+
+    if (action === 'getFamily') {
+      const lead = (e.parameter.lead || '').trim();
+      if (!lead) return _json({ ok: false, error: 'Missing "lead" parameter.' });
+
+      const roster = _readRoster();
+      const match = roster.find(r => {
+        if (CASE_INSENSITIVE) {
+          return String(r.LeadName || '').toLowerCase() === lead.toLowerCase();
+        }
+        return String(r.LeadName || '') === lead;
+      });
+
+      if (!match) {
+        return _json({ ok: false, error: 'Lead not found. Please check the spelling or contact the couple.' });
+      }
+
+      return _json({
+        ok: true,
+        data: {
+          familyId: match.FamilyID,
+          leadName: match.LeadName,
+          members: match.Members,
+          submitted: match.Submitted,
+          submittedAt: match.SubmittedAt ? new Date(match.SubmittedAt).toISOString() : null
+        }
+      });
     }
-    return jsonResponse({ status: 'error', message: 'Unsupported action.' });
-  } catch (error) {
-    Logger.log('[RSVP] Error handling GET request: %s', error);
-    return jsonResponse({ status: 'error', message: error.message || String(error) });
+
+    // default route / health
+    return _json({ ok: true, status: 'RSVP API is live.' });
+  } catch (err) {
+    return _json({ ok: false, error: String(err) });
   }
 }
 
+// POST JSON to submit family response
+// Body:
+// {
+//   "familyId": "FAM-001",
+//   "leadName": "Mariel Jabillo",
+//   "notes": "Vegetarian meal for Chloe",
+//   "statuses": [{"name":"Mariel Jabillo","attending":true}, ...]
+// }
 function doPost(e) {
   try {
-    const payload = parsePayload(e);
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    const guestSheet = getRequiredSheet(ss, GUEST_LIST_TAB);
-    const responseSheet = getRequiredSheet(ss, RESPONSES_TAB);
+    const lock = LockService.getScriptLock();
+    lock.tryLock(30000); // 30s
 
-    ensureHeaders(responseSheet, RESPONSE_HEADERS);
-    appendResponseRow(responseSheet, payload);
-    updateGuestListRows(guestSheet, payload);
+    const body = JSON.parse(e.postData.contents || '{}');
+    const { familyId, leadName, notes, statuses } = body;
 
-    return jsonResponse({ status: 'ok' });
-  } catch (error) {
-    Logger.log('[RSVP] Error handling submission: %s', error);
-    return jsonResponse({ status: 'error', message: error.message || String(error) });
-  }
-}
-
-function doOptions() {
-  return jsonResponse({ status: 'ok' });
-}
-
-function parsePayload(e) {
-  if (!e || !e.parameter) {
-    throw new Error('No form data was received.');
-  }
-
-  const data = e.parameter;
-  const familyId = (data.FamilyID || '').trim();
-  if (!familyId) {
-    throw new Error('Missing required FamilyID field.');
-  }
-
-  const timestamp = new Date();
-  const attendingNames = (data.AttendingNames || '')
-    .split(',')
-    .map(function (name) {
-      return name.trim();
-    })
-    .filter(Boolean);
-
-  const payload = {
-    familyId: familyId,
-    submittedBy: (data.Name || '').trim(),
-    leadName: (data.LeadName || '').trim(),
-    email: (data.Email || '').trim(),
-    attendance: (data.Attendance || '').trim(),
-    attendingNames: attendingNames,
-    attendingCount: attendingNames.length,
-    timestamp: timestamp,
-    raw: data,
-  };
-
-  payload.status = deriveStatus(payload);
-  return payload;
-}
-
-function deriveStatus(payload) {
-  const attendance = (payload.attendance || '').toLowerCase();
-  if (!attendance) {
-    return 'Pending';
-  }
-  if (attendance === 'not attending') {
-    return 'Declined';
-  }
-  if (payload.attendingCount > 0) {
-    return 'Confirmed';
-  }
-  return 'Pending';
-}
-
-function getRequiredSheet(spreadsheet, name) {
-  const sheet = spreadsheet.getSheetByName(name);
-  if (!sheet) {
-    throw new Error('The sheet "' + name + '" could not be found.');
-  }
-  return sheet;
-}
-
-function ensureHeaders(sheet, headers) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(headers);
-    return;
-  }
-
-  const currentHeaders = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
-  var needsUpdate = false;
-  for (var i = 0; i < headers.length; i++) {
-    if ((currentHeaders[i] || '').toString().trim() !== headers[i]) {
-      needsUpdate = true;
-      break;
+    if (!familyId || !leadName || !Array.isArray(statuses) || statuses.length === 0) {
+      return _json({ ok: false, error: 'Missing required fields (familyId, leadName, statuses).' });
     }
-  }
 
-  if (needsUpdate) {
-    sheet.insertRowBefore(1);
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  }
-}
+    // Validate family & lock status
+    const roster = _readRoster();
+    const match = roster.find(r => {
+      const leadOk = CASE_INSENSITIVE
+        ? String(r.LeadName || '').toLowerCase() === String(leadName || '').toLowerCase()
+        : String(r.LeadName || '') === String(leadName || '');
+      return leadOk && String(r.FamilyID) === String(familyId);
+    });
 
-function appendResponseRow(sheet, payload) {
-  const timestamp = formatDateTime(payload.timestamp);
-  sheet.appendRow([
-    timestamp,
-    payload.familyId,
-    payload.leadName || payload.submittedBy,
-    payload.submittedBy || payload.leadName,
-    payload.email,
-    payload.attendance,
-    payload.status,
-    payload.attendingNames.join(', '),
-    JSON.stringify(payload.raw),
-  ]);
-}
-
-function updateGuestListRows(sheet, payload) {
-  const range = sheet.getDataRange();
-  const values = range.getValues();
-  if (values.length <= 1) {
-    throw new Error('The guest list sheet must contain a header row and at least one guest.');
-  }
-
-  const headers = values[0];
-  const columnIndex = mapHeaders(headers);
-  const familyIdColumn = columnIndex.FamilyID;
-  if (familyIdColumn == null) {
-    throw new Error('The guest list sheet is missing a FamilyID column.');
-  }
-
-  const matchingRows = [];
-  for (var row = 1; row < values.length; row++) {
-    var rowFamilyId = (values[row][familyIdColumn] || '').toString().trim();
-    if (rowFamilyId === payload.familyId) {
-      matchingRows.push(row);
+    if (!match) {
+      return _json({ ok: false, error: 'Family not found or lead mismatch.' });
     }
-  }
 
-  if (matchingRows.length === 0) {
-    throw new Error('No rows were found for FamilyID "' + payload.familyId + '".');
-  }
+    if (match.Submitted) {
+      return _json({
+        ok: false,
+        locked: true,
+        message: 'This family’s RSVP has already been submitted. Please contact the couple for changes.'
+      });
+    }
 
-  var leadName = payload.leadName;
-  if (!leadName && columnIndex.Role != null && columnIndex.MemberName != null) {
-    for (var i = 0; i < matchingRows.length; i++) {
-      var rowIndex = matchingRows[i];
-      var role = (values[rowIndex][columnIndex.Role] || '').toString().toLowerCase();
-      if (role === 'lead') {
-        leadName = (values[rowIndex][columnIndex.MemberName] || '').toString().trim();
-        break;
+    // Validate members (names must be within the roster’s Members list)
+    const allowed = new Set(match.Members.map(m => CASE_INSENSITIVE ? m.toLowerCase() : m));
+    for (const s of statuses) {
+      const key = CASE_INSENSITIVE ? String(s.name).toLowerCase() : String(s.name);
+      if (!allowed.has(key)) {
+        return _json({ ok: false, error: `Unknown member "${s.name}" for this family.` });
       }
     }
+
+    // Write responses (one row per person)
+    _appendResponses(match.FamilyID, match.LeadName, notes, statuses);
+
+    // Lock the family in Roster
+    _writeSubmitLock(match.rowIndex);
+
+    return _json({ ok: true, message: 'RSVP submitted. Thank you!' });
+  } catch (err) {
+    return _json({ ok: false, error: String(err) });
+  } finally {
+    try {
+      LockService.getScriptLock().releaseLock();
+    } catch (_) {}
   }
-  if (!leadName) {
-    leadName = payload.submittedBy;
-  }
-
-  const formattedTimestamp = formatDateTime(payload.timestamp);
-  const attendingCount = payload.status === 'Declined' ? 0 : payload.attendingCount;
-  const attendanceNote = payload.status === 'Declined'
-    ? 'Not attending'
-    : payload.attendingNames.join(', ');
-
-  for (var j = 0; j < matchingRows.length; j++) {
-    var index = matchingRows[j];
-
-    if (columnIndex.GuestsAttending != null) {
-      values[index][columnIndex.GuestsAttending] = attendingCount;
-    }
-    if (columnIndex.RSVPStatus != null) {
-      values[index][columnIndex.RSVPStatus] = payload.status;
-    }
-    if (columnIndex.LastUpdated != null) {
-      values[index][columnIndex.LastUpdated] = formattedTimestamp;
-    }
-    if (columnIndex.Notes != null && attendanceNote) {
-      values[index][columnIndex.Notes] = attendanceNote;
-    }
-    if (columnIndex.ContactEmail != null && payload.email) {
-      values[index][columnIndex.ContactEmail] = payload.email;
-    }
-    if (columnIndex.LeadName != null && leadName) {
-      values[index][columnIndex.LeadName] = leadName;
-    }
-  }
-
-  range.setValues(values);
 }
 
-function getGuestListRows(sheet) {
-  const values = sheet.getDataRange().getDisplayValues();
-  if (values.length <= 1) {
-    return [];
-  }
-
-  const headers = values[0].map(function (header) {
-    return (header || '').toString().trim();
-  });
-
-  const rows = [];
-  for (var row = 1; row < values.length; row++) {
-    var rowValues = values[row];
-    var record = {};
-    var isEmpty = true;
-    for (var col = 0; col < headers.length; col++) {
-      var key = headers[col];
-      if (!key) {
-        continue;
-      }
-      var cell = rowValues[col];
-      if (cell !== '' && cell != null) {
-        isEmpty = false;
-      }
-      record[key] = cell;
-    }
-    if (!isEmpty) {
-      rows.push(record);
-    }
-  }
-
-  return rows;
-}
-
-function mapHeaders(headers) {
-  var map = {};
-  for (var i = 0; i < headers.length; i++) {
-    var key = (headers[i] || '').toString().trim();
-    if (key) {
-      map[key] = i;
-    }
-  }
-  return map;
-}
-
-function formatDateTime(date) {
-  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-}
-
-function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
-    .setHeader('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+function _json(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
