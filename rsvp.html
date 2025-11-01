@@ -127,7 +127,7 @@
   const form          = document.getElementById('rsvp-form');
   const statusBanner  = document.getElementById('eligibility-message');
   const famBox        = document.getElementById('family-summary');
-  const famTitle      = document.getElementById('family-summary-title');
+  // const famTitle      = document.getElementById('family-summary-title');
   const famCount      = document.getElementById('family-summary-count');
   const famCode       = document.getElementById('family-summary-code');
   const famMembers    = document.getElementById('family-summary-members');
@@ -155,11 +155,11 @@
 
   function showFamily(f) {
     famBox.classList.remove('is-hidden');
-    famTitle.textContent = `${f.leadName} — Family ID: ${f.familyId}`;
+    famTitle.textContent = `Hello ${f.leadName}!`;
     const members = Array.isArray(f.members) ? f.members : [];
     famCount.textContent = `Members on this invitation: ${members.length}`;
     famMembers.textContent = members.join(', ');
-    famCode.textContent = `Family code: ${familyCode}`;
+    // famCode.textContent = `Family code: ${familyCode}`;
   }
 
   function hideFamily() {
@@ -259,7 +259,7 @@
       const payload = await res.json();
 
       if (!payload.ok) {
-        setBanner('error', payload.error || 'We could not find that family code.');
+        setBanner('error', payload.error || 'We could not find that invite code.');
         hideFamily();
         formDetails.classList.add('is-hidden');
         currentFamily = null;
@@ -285,8 +285,8 @@
     const cached = sessionStorage.getItem('RSVP_FAMILY_CACHE');
 
     if (!familyCode) {
-      setBanner('error', 'Please return to the welcome page and enter your family code to RSVP.');
-      introText.textContent = 'Enter your family code on the welcome page to manage your RSVP.';
+      setBanner('error', 'Please return to the welcome page and enter your invite code to RSVP.');
+      introText.textContent = 'Enter your invite code on the welcome page to manage your RSVP.';
       setFormEnabled(false);
       hideFamily();
       formDetails.classList.add('is-hidden');
@@ -312,7 +312,7 @@
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!currentFamily || !familyCode) {
-      setBanner('error', 'Please enter your family code on the welcome page to begin.');
+      setBanner('error', 'Please enter your invite code on the welcome page to begin.');
       return;
     }
 

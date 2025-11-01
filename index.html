@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome | Patricia & Mark</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Lancelot&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -38,6 +38,7 @@
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
+      font-family: 'Libre Baskerville', serif;
       font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
@@ -53,7 +54,7 @@
 </head>
 <body>
   <h2> 06 - 08 - 26 💕</h2>
-  <input type="text" id="access-code" placeholder="Enter your family's unique code" autocomplete="one-time-code" />
+  <input type="text" id="access-code" placeholder="Enter your invitation code" autocomplete="one-time-code" />
   <button id="enter-btn">Enter</button>
   <p id="error" role="alert"></p>
 
@@ -86,7 +87,7 @@
 
         sessionStorage.setItem('RSVP_FAMILY_CODE', rawCode);
         sessionStorage.setItem('RSVP_FAMILY_CACHE', JSON.stringify(payload.data || {}));
-        window.location.href = 'main.html?page=rsvp';
+        window.location.href = 'main.html?page=welcome';
       } catch (err) {
         console.error(err);
         errorBox.textContent = 'We could not verify that code. Please check your connection and try again.';
