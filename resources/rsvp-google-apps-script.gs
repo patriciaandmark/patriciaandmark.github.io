@@ -50,6 +50,15 @@ function _nowISO() {
   return new Date();
 }
 
+function _formatTimestampColumn(sheet, columnIndex, startRow = 2) {
+  if (!sheet || !columnIndex) return;
+  const lastRow = sheet.getLastRow();
+  if (lastRow < startRow) return;
+  sheet
+    .getRange(startRow, columnIndex, lastRow - startRow + 1, 1)
+    .setNumberFormat('yyyy-mm-dd hh:mm:ss');
+}
+
 function _parseMembers(cell) {
   if (!cell) return [];
   return String(cell)
@@ -112,23 +121,73 @@ function _findRosterByCode(roster, code) {
   return roster.find((entry) => _normalizeForMatch(entry.UniqueCode) === target);
 }
 
-function _appendResponses(familyID, leadName, notes, statuses) {
+function _upsertResponses(familyID, leadName, notes, statuses, timestamp) {
   const sh = _getSheet(SHEET_RESPONSES);
   if (sh.getLastRow() === 0) {
     sh.appendRow(['Timestamp', 'FamilyID', 'PersonName', 'Attending', 'SubmittedBy', 'Notes']);
   }
 
-  const ts = _nowISO();
-  const rows = statuses.map((s) => [
-    ts,
-    familyID,
-    s.name,
-    s.attending ? 'Yes' : 'No',
-    leadName,
-    notes || ''
-  ]);
+  const headerMap = _getHeaderMap(sh);
+  const timestampCol = _resolveColumn(headerMap, 'Timestamp', 'SubmittedAt');
+  const familyIdCol = _resolveColumn(headerMap, 'FamilyID', 'Family Id', 'Family');
+  const personNameCol = _resolveColumn(headerMap, 'PersonName', 'Name', 'Guest');
+  const attendingCol = _resolveColumn(headerMap, 'Attending', 'Response', 'RSVP');
+  const submittedByCol = _resolveColumn(headerMap, 'SubmittedBy', 'Submitted By', 'LeadName', 'Submitted');
+  const notesCol = _resolveColumn(headerMap, 'Notes', 'Comments', 'Message');
+  const width = sh.getLastColumn();
 
-  sh.getRange(sh.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+  const existing = new Map();
+  const lastRow = sh.getLastRow();
+  if (lastRow > 1 && familyIdCol && personNameCol) {
+    const data = sh.getRange(2, 1, lastRow - 1, width).getValues();
+    data.forEach((row, idx) => {
+      const familyValue = row[familyIdCol - 1];
+      const nameValue = row[personNameCol - 1];
+      if (!familyValue || !nameValue) return;
+      const key = `${familyValue}::${_normalizeForMatch(nameValue)}`;
+      if (!existing.has(key)) {
+        existing.set(key, idx + 2);
+      }
+    });
+  }
+
+  const sanitizedNotes = typeof notes === 'string' ? notes.trim() : String(notes || '');
+  const ts = timestamp instanceof Date ? timestamp : _nowISO();
+  const newRows = [];
+
+  statuses.forEach((entry) => {
+    if (!entry) return;
+    const name = _normalize(entry.name);
+    if (!name) return;
+    const attendingValue = entry.attending ? 'Yes' : 'No';
+    const key = `${familyID}::${_normalizeForMatch(name)}`;
+
+    if (existing.has(key)) {
+      const rowIndex = existing.get(key);
+      if (timestampCol) sh.getRange(rowIndex, timestampCol).setValue(ts);
+      if (familyIdCol) sh.getRange(rowIndex, familyIdCol).setValue(familyID);
+      if (personNameCol) sh.getRange(rowIndex, personNameCol).setValue(name);
+      if (attendingCol) sh.getRange(rowIndex, attendingCol).setValue(attendingValue);
+      if (submittedByCol) sh.getRange(rowIndex, submittedByCol).setValue(leadName);
+      if (notesCol) sh.getRange(rowIndex, notesCol).setValue(sanitizedNotes);
+    } else {
+      const row = new Array(Math.max(width, 6)).fill('');
+      if (timestampCol) row[timestampCol - 1] = ts;
+      if (familyIdCol) row[familyIdCol - 1] = familyID;
+      if (personNameCol) row[personNameCol - 1] = name;
+      if (attendingCol) row[attendingCol - 1] = attendingValue;
+      if (submittedByCol) row[submittedByCol - 1] = leadName;
+      if (notesCol) row[notesCol - 1] = sanitizedNotes;
+      newRows.push(row);
+    }
+  });
+
+  if (newRows.length) {
+    const startRow = sh.getLastRow() + 1;
+    sh.getRange(startRow, 1, newRows.length, newRows[0].length).setValues(newRows);
+  }
+
+  _formatTimestampColumn(sh, timestampCol);
 }
 
 function _writeSubmissionStatus(rowIndex, submittedAt) {
@@ -142,6 +201,7 @@ function _writeSubmissionStatus(rowIndex, submittedAt) {
   }
   if (submittedAtCol) {
     sh.getRange(rowIndex, submittedAtCol).setValue(submittedAt || _nowISO());
+    _formatTimestampColumn(sh, submittedAtCol);
   }
 }
 
@@ -295,8 +355,8 @@ function doPost(e) {
       }
     }
 
-    _appendResponses(match.FamilyID, match.LeadName, notes, statuses);
     const submittedAt = _nowISO();
+    _upsertResponses(match.FamilyID, match.LeadName, notes, statuses, submittedAt);
     _writeSubmissionStatus(match.rowIndex, submittedAt);
 
     return _json({ ok: true, message: 'RSVP saved.', submittedAt: submittedAt.toISOString() });
