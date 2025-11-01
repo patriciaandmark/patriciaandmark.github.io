@@ -1,1 +1,376 @@
-<h2>FAQs</h2><p>All your questions answered here!</p>
+<section class="faq-wrapper" aria-labelledby="faq-title">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Lancelot&display=swap');
+
+    .faq-wrapper {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      box-shadow: 0 18px 50px rgba(96, 78, 64, 0.08);
+      backdrop-filter: blur(6px);
+    }
+
+    .faq-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .faq-header h2 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 2.25rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5e524b;
+      margin-bottom: 0.5rem;
+    }
+
+    .faq-header p {
+      font-family: 'Lancelot', cursive;
+      font-size: 1.2rem;
+      color: #8c7a72;
+      margin: 0;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .faq-item {
+      border: none;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #d8c3b4;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .faq-item:focus-within,
+    .faq-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(96, 78, 64, 0.18);
+    }
+
+    .faq-question {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+      color: #4b413c;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .faq-question::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-question-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.65);
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      color: #5e524b;
+      flex: 0 0 auto;
+      transition: transform 0.25s ease;
+    }
+
+    details[open] .faq-question-icon {
+      transform: rotate(90deg);
+    }
+
+    .faq-answer {
+      background: #f9eee2;
+      font-family: 'Lancelot', cursive;
+      color: #5f524c;
+      font-size: 1.1rem;
+      line-height: 1.75;
+      padding: 1.5rem 2rem 2rem;
+      border-top: 1px solid rgba(94, 82, 75, 0.15);
+    }
+
+    .faq-answer strong {
+      font-family: 'Libre Baskerville', serif;
+      color: #4b3e38;
+    }
+
+    .faq-answer a {
+      color: #8c5a4f;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(140, 90, 79, 0.4);
+    }
+
+    .faq-answer a:hover {
+      color: #5e524b;
+      border-bottom-color: transparent;
+    }
+
+    .venue-card {
+      display: grid;
+      gap: 0.35rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 14px;
+      border: 1px solid rgba(94, 82, 75, 0.12);
+      font-size: 1rem;
+    }
+
+    .faq-answer figure {
+      margin: 1.5rem 0 0;
+      text-align: center;
+    }
+
+    .faq-answer figcaption {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      font-family: 'Libre Baskerville', serif;
+      color: #8c7a72;
+    }
+
+    .map-links,
+    .gift-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .map-links a,
+    .gift-links a {
+      background: rgba(216, 195, 180, 0.35);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+
+    .gift-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .gift-grid article {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      border: 1px solid rgba(94, 82, 75, 0.1);
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .gift-details {
+      font-size: 0.95rem;
+      font-family: 'Libre Baskerville', serif;
+      line-height: 1.6;
+    }
+
+    .qr-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .qr-stack img {
+      width: 160px;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(94, 82, 75, 0.12);
+      box-shadow: 0 10px 20px rgba(94, 82, 75, 0.15);
+    }
+
+    .schedule-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .hashtags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .hashtags span {
+      background: rgba(216, 195, 180, 0.4);
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-family: 'Libre Baskerville', serif;
+    }
+
+    @media (max-width: 640px) {
+      .faq-wrapper {
+        padding: 2rem 1.25rem 3rem;
+      }
+
+      .faq-question {
+        font-size: 1.1rem;
+        align-items: flex-start;
+      }
+
+      .faq-question-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.1rem;
+      }
+
+      .faq-answer {
+        padding: 1.25rem 1.4rem 1.75rem;
+        font-size: 1rem;
+      }
+
+      .qr-stack img {
+        width: 140px;
+      }
+    }
+  </style>
+
+  <header class="faq-header">
+    <h2 id="faq-title">Frequently Asked Questions</h2>
+    <p>Tap on a question below to reveal the answer — we kept everything cozy and curated for you.</p>
+  </header>
+
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary class="faq-question"><span>When is the wedding?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        Wedding bells ring on <strong>June 08, 2026 (Monday)</strong>. Mark your calendars and be sure to file that leave — we cannot wait to celebrate with you! ✨
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>Where is the church ceremony?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        <div class="venue-card" role="group" aria-label="Church ceremony details">
+          <strong>Iglesia Ni Cristo Lokal ng Guadalupe</strong>
+          <span>1212 Nuestra Del Carmen, Makati City</span>
+          <span>This is an indoor church wedding ceremony and parking is available for guests.</span>
+        </div>
+        <div class="map-links">
+          <a href="https://maps.app.goo.gl/KiywHQBxFL5ZC2SH7" target="_blank" rel="noopener">Open in Google Maps</a>
+          <a href="https://waze.com/ul?place=ChIJGb5H7RrJlA0RHg3ocOITkkk" target="_blank" rel="noopener">Open in Waze</a>
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>Where is the reception?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        <div class="venue-card" role="group" aria-label="Reception details">
+          <strong>The Enderun Tent</strong>
+          <span>Enderun Colleges, 1100 Campus Avenue McKinley Hill, Taguig City</span>
+          <span>Indoor reception with limited parking on a first-come-first-served basis. Overflow parking is available at the Venice Grand Canal Mall across Enderun Colleges.</span>
+        </div>
+        <div class="map-links">
+          <a href="https://maps.app.goo.gl/FSR2pE3bGP7Z5cMU8" target="_blank" rel="noopener">Open in Google Maps</a>
+          <a href="https://waze.com/ul?place=ChIJD-bcY1LCzDsRqu5F0EzYreE" target="_blank" rel="noopener">Open in Waze</a>
+          <a href="https://maps.app.goo.gl/jVDuZtrGij12fLSY9" target="_blank" rel="noopener">Venice Grand Canal Mall Parking</a>
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>What should we wear?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        Think modern romantic in <strong>taupe, blush, cream, and mocha</strong> tones. Keep it dressy, dreamy, and ready for lots of photos.
+        <figure>
+          <img src="resources/dress-code-palette.svg" alt="Sample palette for the dress code with taupe, blush, cream, and mocha swatches." loading="lazy" width="320" height="200">
+          <figcaption>Save this palette for outfit planning inspiration.</figcaption>
+        </figure>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>Can we send gifts?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        Your presence is already the sweetest gift, but if you would like to share a token of love, we would be grateful for cash gifts to help us start our new chapter. Money envelopes will also be ready on the day.
+        <p style="margin: 0.75rem 0 0; font-family: 'Libre Baskerville', serif; font-size: 0.95rem; color: #7a6961;">(Replace the sample account numbers and QR images below with your official details.)</p>
+        <div class="gift-grid">
+          <article aria-label="BPI account details">
+            <strong>BPI</strong>
+            <div class="gift-details">
+              Account Name: Patricia Anne Santos<br>
+              Account Number: 1234-5678-90<br>
+              SWIFT Code: BOPIPHMM
+            </div>
+            <div class="qr-stack">
+              <img src="resources/bpi-qr-placeholder.svg" alt="Placeholder for BPI QR code." loading="lazy">
+            </div>
+          </article>
+          <article aria-label="RCBC account details">
+            <strong>RCBC</strong>
+            <div class="gift-details">
+              Account Name: Mark Daniel Cruz<br>
+              Account Number: 9876-5432-10<br>
+              SWIFT Code: RCBCPHMM
+            </div>
+            <div class="qr-stack">
+              <img src="resources/rcbc-qr-placeholder.svg" alt="Placeholder for RCBC QR code." loading="lazy">
+            </div>
+          </article>
+          <article aria-label="GCash details">
+            <strong>GCash</strong>
+            <div class="gift-details">
+              Patricia Anne · 0917 000 0000<br>
+              Mark Daniel · 0917 111 1111
+            </div>
+            <div class="qr-stack">
+              <img src="resources/gcash-qr-placeholder.svg" alt="Placeholder for GCash QR code." loading="lazy">
+              <img src="resources/gcash-qr-placeholder.svg" alt="Placeholder for second GCash QR code." loading="lazy">
+            </div>
+          </article>
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>Who can come? Are kids invited?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        We would love to celebrate with you! Kindly confirm your attendance by <strong>Friday, 08 May 2026</strong> so we can reserve your seat at the table.
+        <div class="map-links" role="group" aria-label="RSVP options">
+          <a href="main.html?page=rsvp" target="_blank" rel="noopener">Click here to RSVP</a>
+        </div>
+        Our wedding is an intimate celebration — invitations are non-transferable. We absolutely adore your little ones, but due to limited space, only immediate family and entourage members may bring their kids.
+        <div class="hashtags" aria-label="Official wedding hashtags">
+          <span>#HappyHunday</span>
+          <span>#HappyHunday2026</span>
+          <span>#HappyHunday060826</span>
+        </div>
+        <p style="margin-top: 1rem; font-family: 'Libre Baskerville', serif; font-size: 0.95rem; color: #7a6961;">Please keep phones tucked away during the ceremony so we can all be fully present. Snap, share, and tag us freely at the reception!</p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>What food and drinks are served?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        Prepare to feast! We have a curated cocktail hour followed by a generous buffet dinner — all thoughtfully prepared with you in mind. Kindly let us know about any dietary restrictions in the RSVP form so we can take care of you.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question"><span>What is the schedule of events?</span><span class="faq-question-icon">➤</span></summary>
+      <div class="faq-answer">
+        Here's a little peek at how the day will flow — final details will be shared closer to the date.
+        <div class="schedule-grid">
+          <figure>
+            <img src="resources/schedule-of-events.svg" alt="Sample wedding day timeline with ceremony prelude, exchange of vows, and reception highlights." loading="lazy" width="340" height="210">
+            <figcaption>Pin this guide and get excited for every moment.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>

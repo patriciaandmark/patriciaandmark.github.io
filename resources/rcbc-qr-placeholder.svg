@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <rect width="200" height="240" fill="#f7f2ec" rx="12"/>
+  <rect x="40" y="40" width="120" height="120" fill="#c9bab0" rx="8"/>
+  <text x="100" y="190" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="16" fill="#5f524c">RCBC QR</text>
+  <text x="100" y="210" text-anchor="middle" font-family="'Lancelot', cursive" font-size="14" fill="#7a6961">Swap with official code</text>
+</svg>
