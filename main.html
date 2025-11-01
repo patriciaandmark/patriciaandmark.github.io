@@ -81,7 +81,15 @@
         });
     }
 
-    window.onload = () => loadPage('welcome.html');
+    function resolveInitialPage() {
+      const params = new URLSearchParams(window.location.search);
+      const target = (params.get('page') || '').trim();
+      if (!target) return 'welcome.html';
+      const allowed = new Set(['welcome', 'our-story', 'gallery', 'rsvp', 'faq']);
+      return allowed.has(target) ? `${target}.html` : 'welcome.html';
+    }
+
+    window.onload = () => loadPage(resolveInitialPage());
   </script>
 </body>
 </html>
