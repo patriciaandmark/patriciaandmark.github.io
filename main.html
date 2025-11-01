@@ -7,47 +7,70 @@
   <title>Patricia & Mark | 06.08.26</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Lancelot&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --font-heading: 'Libre Baskerville', serif;
+      --font-body: 'Libre Baskerville', serif;
+      --color-background: #f9f4f0;
+      --color-surface: #ffffff;
+      --color-heading: #5e524b;
+      --color-text: #8c7a72;
+      --color-accent: #d8c3b4;
+      --color-muted: #bfa89c;
+    }
+
     body {
-      font-family: 'Lancelot', cursive;
-      background: #f9f9f9;
-      color: #333;
+      font-family: var(--font-body);
+      background: var(--color-background);
+      color: var(--color-text);
       margin: 0;
       text-align: center;
     }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      color: var(--color-heading);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    p, li, span, label {
+      color: var(--color-text);
+    }
+
     nav {
-      background: #fff;
+      background: var(--color-surface);
       padding: 1rem;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(94, 82, 75, 0.08);
     }
     nav a {
       margin: 0 1rem;
       text-decoration: none;
-      color: #7e6d65;
+      color: var(--color-heading);
       font-weight: 600;
-      font-family: 'Libre Baskerville', serif;
+      font-family: var(--font-heading);
       letter-spacing: 0.5px;
     }
     nav a:hover {
-      color: #c9bab0;
+      color: var(--color-accent);
       transition: color 0.3s ease;
     }
     footer {
-      font-family: 'Libre Baskerville', serif;
+      font-family: var(--font-heading);
       font-size: 0.85rem;
-      color: #7e6d65;
-      background: #fff;
+      color: var(--color-heading);
+      background: var(--color-surface);
       padding: 1.5rem 0;
       letter-spacing: 0.5px;
-      border-top: 1px solid rgba(0,0,0,0.05);
-    } 
+      border-top: 1px solid rgba(94, 82, 75, 0.08);
+    }
     #page-content {
       padding: 2rem;
       opacity: 0;
       transition: opacity 0.5s ease;
-      font-family: 'Libre Baskerville', serif;
+      font-family: var(--font-body);
     }
     #page-content.loaded {
       opacity: 1;

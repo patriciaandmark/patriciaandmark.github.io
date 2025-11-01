@@ -1,5 +1,16 @@
 <h2>RSVP</h2>
 <style>
+  :root {
+    --font-heading: 'Libre Baskerville', serif;
+    --font-body: 'Libre Baskerville', serif;
+    --color-background: #f9f4f0;
+    --color-surface: #ffffff;
+    --color-heading: #5e524b;
+    --color-text: #8c7a72;
+    --color-accent: #d8c3b4;
+    --color-muted: rgba(94, 82, 75, 0.35);
+  }
+
   .rsvp-layout {
     display: grid;
     gap: 2rem;
@@ -9,16 +20,17 @@
   }
 
   .rsvp-form {
-    background: #fff;
+    background: var(--color-surface);
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 24px rgba(94, 82, 75, 0.08);
     text-align: left;
+    font-family: var(--font-body);
   }
 
   .rsvp-intro {
     margin: 0;
-    color: #7a6d64;
+    color: var(--color-text);
   }
 
   .eligibility-message {
@@ -28,58 +40,62 @@
     font-size: 0.95rem;
     line-height: 1.5;
     border: 1px solid transparent;
+    font-family: var(--font-body);
   }
-  .eligibility-message[data-status="checking"] { background: #f1ede9; border-color: #e0d6cd; color: #5e524b; }
-  .eligibility-message[data-status="ok"]       { background: rgba(73,160,120,.12); border-color: rgba(73,160,120,.35); color:#2e6b4f; }
-  .eligibility-message[data-status="info"]     { background: rgba(255,193,7,.12); border-color: rgba(255,193,7,.35); color:#8a6d00; }
-  .eligibility-message[data-status="error"]    { background: rgba(220,53,69,.12); border-color: rgba(220,53,69,.35); color:#a12635; }
+  .eligibility-message[data-status="checking"] { background: #f1ede9; border-color: #e0d6cd; color: var(--color-heading); }
+  .eligibility-message[data-status="ok"]       { background: rgba(216, 195, 180, 0.2); border-color: rgba(216, 195, 180, 0.45); color: var(--color-heading); }
+  .eligibility-message[data-status="info"]     { background: rgba(249, 238, 226, 0.8); border-color: rgba(216, 195, 180, 0.4); color: var(--color-text); }
+  .eligibility-message[data-status="error"]    { background: rgba(221, 120, 116, 0.12); border-color: rgba(221, 120, 116, 0.35); color: #a45a51; }
 
-  .family-summary { margin-top: 1.5rem; padding: 1rem; border-radius: 10px; background: #f7f1ed; color: #5e524b; }
-  .family-summary h3 { margin: 0 0 .5rem; font-size: 1.1rem; }
+  .family-summary { margin-top: 1.5rem; padding: 1rem; border-radius: 10px; background: rgba(249, 238, 226, 0.65); color: var(--color-heading); }
+  .family-summary h3 { margin: 0 0 .5rem; font-size: 1.1rem; font-family: var(--font-heading); text-transform: uppercase; letter-spacing: 0.08em; }
   .family-summary p { margin: .25rem 0; }
-  .family-summary-code { font-size: 0.9rem; color: #7a6d64; }
-  .family-summary-members { margin-top: .75rem; font-size: .9rem; color: #5e524b; }
+  .family-summary-code { font-size: 0.9rem; color: var(--color-text); }
+  .family-summary-members { margin-top: .75rem; font-size: .9rem; color: var(--color-text); }
 
-  .last-updated { margin-top: 1rem; font-size: 0.9rem; color: #7a6d64; }
+  .last-updated { margin-top: 1rem; font-size: 0.9rem; color: var(--color-text); }
 
   .form-details { margin-top: 1.5rem; }
-  .form-details label { display: block; margin-top: 1rem; font-weight: 600; color: #5e524b; }
+  .form-details label { display: block; margin-top: 1rem; font-weight: 600; color: var(--color-heading); font-family: var(--font-heading); letter-spacing: 0.05em; }
   .form-details textarea {
     width: 100%;
     min-height: 80px;
     padding: 0.75rem;
     margin-top: 0.25rem;
     border-radius: 8px;
-    border: 1px solid #ccc;
-    font-family: 'Inter', sans-serif;
+    border: 1px solid var(--color-muted);
+    font-family: var(--font-body);
+    color: var(--color-heading);
+    background: rgba(255, 255, 255, 0.9);
     resize: vertical;
   }
 
   .attendee-selector { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; }
-  .attendee-instructions { margin: 0 0 .75rem; font-size: .9rem; color: #7a6d64; }
+  .attendee-instructions { margin: 0 0 .75rem; font-size: .9rem; color: var(--color-text); }
   .attendance-rows { display: grid; gap: .5rem; }
 
   .attendee-row {
     display: flex; align-items: center; justify-content: space-between; gap: .75rem;
-    border: 1px solid #eee; border-radius: 8px; padding: .5rem .75rem; background: #faf9f8;
+    border: 1px solid rgba(94, 82, 75, 0.15); border-radius: 8px; padding: .5rem .75rem; background: rgba(255, 255, 255, 0.95);
   }
-  .attendee-name { font-weight: 600; color: #5e524b; }
-  .attendee-select { border: 1px solid #ccc; border-radius: 8px; padding: .4rem .6rem; background: #fff; }
+  .attendee-name { font-weight: 600; color: var(--color-heading); font-family: var(--font-heading); }
+  .attendee-select { border: 1px solid var(--color-muted); border-radius: 8px; padding: .4rem .6rem; background: rgba(255, 255, 255, 0.95); font-family: var(--font-body); color: var(--color-heading); }
 
   .rsvp-form button[type="submit"] {
     margin-top: 1.5rem;
     width: 100%;
-    background-color: #c9bab0;
-    color: white;
+    background-color: var(--color-accent);
+    color: var(--color-heading);
     border: none;
     border-radius: 8px;
     padding: 0.75rem;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.2s;
+    font-family: var(--font-heading);
   }
-  .rsvp-form button[type="submit"]:hover { background-color: #b3a69c; }
-  .rsvp-form button[type="submit"]:disabled { background-color: #e0d6cd; cursor: not-allowed; }
+  .rsvp-form button[type="submit"]:hover { background-color: #cbb4a5; transform: translateY(-1px); }
+  .rsvp-form button[type="submit"]:disabled { background-color: rgba(216, 195, 180, 0.6); cursor: not-allowed; color: rgba(94, 82, 75, 0.65); }
 
   .is-hidden { display: none !important; }
 </style>

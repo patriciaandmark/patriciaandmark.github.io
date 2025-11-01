@@ -7,53 +7,70 @@
   <title>Welcome | Patricia & Mark</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Lancelot&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --font-heading: 'Libre Baskerville', serif;
+      --font-body: 'Libre Baskerville', serif;
+      --color-background: #f9f4f0;
+      --color-heading: #5e524b;
+      --color-text: #8c7a72;
+      --color-accent: #d8c3b4;
+    }
+
     body {
       margin: 0;
-      font-family: 'Lancelot', cursive;
-      background: #f9f7f5;
-      color: #333;
+      font-family: var(--font-body);
+      background: var(--color-background);
+      color: var(--color-text);
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       flex-direction: column;
       text-align: center;
+      padding: 1.5rem;
     }
     h2 {
-      font-family: 'Libre Baskerville', serif;
+      font-family: var(--font-heading);
       font-size: 1.8rem;
-      color: #5e524b;
+      color: var(--color-heading);
       margin-bottom: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     input {
       padding: 0.75rem;
       font-size: 1rem;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid rgba(94, 82, 75, 0.25);
       margin-bottom: 1rem;
       width: 250px;
+      font-family: var(--font-body);
+      color: var(--color-heading);
+      background: rgba(255, 255, 255, 0.9);
     }
     button {
-      background: #c9bab0;
-      color: white;
+      background: var(--color-accent);
+      color: var(--color-heading);
       border: none;
       padding: 0.75rem 1.5rem;
-      font-family: 'Libre Baskerville', serif;
+      font-family: var(--font-heading);
       font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
     button:hover {
-      background: #b3a69c;
+      background: #cbb4a5;
+      transform: translateY(-1px);
     }
     #error {
-      color: #a55;
+      color: #a45a51;
       margin-top: 0.5rem;
-    }
+      }
   </style>
 </head>
 <body>
-  <h2> 06 - 08 - 26 💕</h2>
+  <h2>06 · 08 · 26 💕</h2>
   <input type="text" id="access-code" placeholder="Enter your invitation code" autocomplete="one-time-code" />
   <button id="enter-btn">Enter</button>
   <p id="error" role="alert"></p>
