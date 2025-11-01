@@ -335,10 +335,22 @@
     try {
       const res = await fetch(API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error('Received an invalid response from the server.');
+      }
 
       if (!data.ok) {
         setBanner('error', data.error || 'Unable to save your RSVP right now.');
