@@ -22,45 +22,13 @@
     color: #5e524b;
   }
 
-  .guest-search-field {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-    flex-wrap: wrap;
-  }
-
   .guest-search input[type="search"] {
-    flex: 1;
+    width: 100%;
     padding: 0.75rem;
+    margin-top: 0.5rem;
     border-radius: 8px;
     border: 1px solid #ccc;
     font-family: 'Inter', sans-serif;
-  }
-
-  .guest-search button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    background: #c9bab0;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .guest-search button:hover,
-  .guest-search button:focus {
-    background: #b3a69c;
-    outline: none;
-  }
-
-  @media (max-width: 540px) {
-    .guest-search-field {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .guest-search button {
-      width: 100%;
-    }
   }
 
   .search-results {
@@ -158,15 +126,12 @@
     <form id="rsvp-form" autocomplete="off">
       <div class="guest-search">
         <label for="guest-search">Find your invitation (type the LEAD name)</label>
-        <div class="guest-search-field">
-          <input type="search" id="guest-search" placeholder="e.g., Mariel Jabillo" autocomplete="off">
-          <button type="button" id="guest-search-button" aria-label="Search for your invitation">Search</button>
-        </div>
+        <input type="search" id="guest-search" placeholder="e.g., Mariel Jabillo" autocomplete="off">
         <div class="search-results" id="guest-results" role="listbox" aria-label="Matches"></div>
       </div>
 
       <div class="eligibility-message" id="eligibility-message" data-status="checking">
-        Type the family lead’s full name, then tap Search.
+        Type the family lead’s full name, then press Enter.
       </div>
 
       <div class="family-summary is-hidden" id="family-summary">
@@ -204,7 +169,6 @@
   const formWrapper   = document.querySelector('.rsvp-form');
   const form          = document.getElementById('rsvp-form');
   const searchInput   = document.getElementById('guest-search');
-  const searchButton  = document.getElementById('guest-search-button');
   const resultsBox    = document.getElementById('guest-results'); // kept for UI parity (optional)
   const statusBanner  = document.getElementById('eligibility-message');
   const famBox        = document.getElementById('family-summary');
@@ -216,8 +180,6 @@
   const notesField    = document.getElementById('notes');
   const rowsContainer = document.getElementById('attendance-rows');
   const submitBtn     = document.getElementById('rsvp-submit');
-  const defaultSubmitLabel = submitBtn.textContent;
-  const updateSubmitLabel = 'Update RSVP';
 
   /******** State ********/
   let currentFamily = null;
@@ -272,70 +234,8 @@
     famMembers.textContent = '';
   }
 
-  function interpretAttendance(entry) {
-    if (!entry) return null;
-    if (typeof entry.attending === 'boolean') {
-      return entry.attending;
-    }
-    const text = (entry.status || entry.attendance || entry.response || entry.answer || '').toString().toLowerCase();
-    if (!text) return null;
-    if (['yes', 'attending', 'attend', 'true', '1'].includes(text)) return true;
-    if (['no', 'not attending', 'decline', 'declined', 'false', '0'].includes(text)) return false;
-    return null;
-  }
-
-  function getExistingStatuses(family) {
-    if (!family) return [];
-    const normalizeObjectStatuses = (obj) => {
-      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
-      return Object.entries(obj).map(([name, attending]) => ({ name, attending }));
-    };
-    if (Array.isArray(family.statuses)) return family.statuses;
-    const objectStatuses = normalizeObjectStatuses(family.statuses);
-    if (objectStatuses) return objectStatuses;
-    if (Array.isArray(family.responses)) return family.responses;
-    const objectResponses = normalizeObjectStatuses(family.responses);
-    if (objectResponses) return objectResponses;
-    if (family.lastSubmission) {
-      if (Array.isArray(family.lastSubmission.statuses)) {
-        return family.lastSubmission.statuses;
-      }
-      const normalized = normalizeObjectStatuses(family.lastSubmission.statuses);
-      if (normalized) return normalized;
-    }
-    if (family.submission) {
-      if (Array.isArray(family.submission.statuses)) {
-        return family.submission.statuses;
-      }
-      const normalizedSubmission = normalizeObjectStatuses(family.submission.statuses);
-      if (normalizedSubmission) return normalizedSubmission;
-    }
-    return [];
-  }
-
-  function getExistingNotes(family) {
-    if (!family) return '';
-    if (typeof family.notes === 'string') return family.notes;
-    if (family.lastSubmission && typeof family.lastSubmission.notes === 'string') {
-      return family.lastSubmission.notes;
-    }
-    if (family.submission && typeof family.submission.notes === 'string') {
-      return family.submission.notes;
-    }
-    return '';
-  }
-
-  function renderMemberRows(family, existingStatuses = []) {
+  function renderMemberRows(family) {
     rowsContainer.innerHTML = '';
-    const statusMap = new Map();
-    existingStatuses.forEach(entry => {
-      const key = normName(entry.name || entry.memberName || entry.member);
-      if (!key) return;
-      const interpreted = interpretAttendance(entry);
-      if (interpreted == null) return;
-      statusMap.set(key, interpreted);
-    });
-
     (family.members || []).forEach(name => {
       const row = document.createElement('div');
       row.className = 'attendee-row';
@@ -352,9 +252,6 @@
       `;
 
       row.dataset.name = name;
-      const mapped = statusMap.get(normName(name));
-      if (mapped === false) sel.value = 'no';
-      if (mapped === true) sel.value = 'yes';
       row.append(left, sel);
       rowsContainer.appendChild(row);
     });
@@ -393,11 +290,9 @@
   async function handleSearch(typed) {
     const q = norm(typed);
     if (!q) {
-      setBanner('checking', 'Type the family lead’s full name, then tap Search.');
+      setBanner('checking', 'Type the family lead’s full name, then press Enter.');
       hideFamily(); hideLock(); setFormEnabled(false);
       formDetails.classList.add('is-hidden');
-      submitBtn.textContent = defaultSubmitLabel;
-      notesField.value = '';
       currentFamily = null;
       return;
     }
@@ -417,25 +312,22 @@
       currentFamily = fam;
       showFamily(fam);
 
+      if (fam.submitted) {
+        showLock('This family’s RSVP has already been submitted. Please contact the couple for any changes.');
+        setBanner('info', 'RSVP already submitted.');
+        return;
+      }
+
       if (!canSubmitFor(fam, q)) {
         setBanner('info', `Only the designated family lead (${fam.leadName}) can submit the RSVP.`);
         formDetails.classList.add('is-hidden');
         return;
       }
 
-      const existingStatuses = getExistingStatuses(fam);
-      const existingNotes = getExistingNotes(fam);
-
-      renderMemberRows(fam, existingStatuses);
-      notesField.value = existingNotes;
-      currentFamily.statuses = existingStatuses;
-      currentFamily.notes = existingNotes;
+      // Render form for lead / admin
+      setBanner('ok', `Welcome ${fam.leadName}! Please confirm each member below.`);
+      renderMemberRows(fam);
       formDetails.classList.remove('is-hidden');
-      submitBtn.textContent = fam.submitted ? updateSubmitLabel : defaultSubmitLabel;
-      const welcomeText = fam.submitted
-        ? `Welcome back ${fam.leadName}! We loaded your previous RSVP—update any details below.`
-        : `Welcome ${fam.leadName}! Please confirm each member below.`;
-      setBanner('ok', welcomeText);
       setFormEnabled(true);
     } catch (err) {
       console.error(err);
@@ -449,7 +341,6 @@
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); handleSearch(searchInput.value); }
   });
-  searchButton?.addEventListener('click', () => handleSearch(searchInput.value));
   searchInput.addEventListener('change', () => handleSearch(searchInput.value));
   // optional: hide suggestions panel if present
   searchInput.addEventListener('blur', () => setTimeout(() => resultsBox?.classList?.remove('is-visible'), 150));
@@ -489,16 +380,8 @@
         return;
       }
 
-      setBanner('ok', 'RSVP saved! You can return here anytime to make updates.');
-      submitBtn.disabled = false;
-      setFormEnabled(true);
-      submitBtn.textContent = updateSubmitLabel;
-      hideLock();
-      currentFamily.submitted = true;
-      currentFamily.statuses = statuses;
-      const normalizedNotes = norm(notesField.value);
-      currentFamily.notes = normalizedNotes;
-      notesField.value = normalizedNotes;
+      setBanner('ok', 'RSVP submitted. Thank you!');
+      showLock('RSVP submitted. If anything changes, please contact the couple.');
     } catch (err) {
       console.error(err);
       setBanner('error', 'Submission failed. Please try again or contact the couple.');
