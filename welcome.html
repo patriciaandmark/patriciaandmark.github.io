@@ -1,5 +1,12 @@
 
 <style>
+  :root {
+    --font-heading: 'Libre Baskerville', serif;
+    --font-body: 'Libre Baskerville', serif;
+    --color-heading: #5e524b;
+    --color-text: #8c7a72;
+  }
+
   .hero-photo {
     width: 100%;
     max-width: 900px;
@@ -8,17 +15,30 @@
     border-radius: 24px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.05);
   }
+  h1 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-heading);
+  }
+
+  p {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    letter-spacing: 0.03em;
+  }
+
   .countdown {
     font-size: 1.25rem;
     margin-top: 2rem;
-    color: #7e6d65;
+    color: var(--color-text);
   }
 </style>
 
 <img class="hero-photo" src="resources/welcome-photo.jpg" alt="Patricia and Mark" />
 
 <h1>Welcome</h1>
-<p>Patricia & Mark — June 8, 2026</p>
+<p>Patricia &amp; Mark — June 8, 2026</p>
 
 <div id="countdown" class="countdown">Loading countdown...</div>
 
