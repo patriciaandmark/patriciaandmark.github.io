@@ -4,8 +4,8 @@
     display: grid;
     gap: 2rem;
     margin: 2rem auto;
-    max-width: 1100px;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-width: 900px;
+    grid-template-columns: 1fr;
   }
 
   .rsvp-form {
@@ -16,47 +16,10 @@
     text-align: left;
   }
 
-  .guest-search label {
-    display: block;
-    font-weight: 600;
-    color: #5e524b;
+  .rsvp-intro {
+    margin: 0;
+    color: #7a6d64;
   }
-
-  .guest-search input[type="search"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .search-results {
-    margin-top: 0.5rem;
-    border: 1px solid #e8e0d8;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
-    max-height: 220px;
-    overflow-y: auto;
-    display: none;
-  }
-  .search-results.is-visible { display: block; }
-
-  .search-result {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    border: none;
-    background: transparent;
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-size: 0.95rem;
-    cursor: pointer;
-  }
-  .search-result:hover, .search-result:focus { background: #f7f1ed; outline: none; }
-  .search-result strong { color: #5e524b; }
-  .search-result small { color: #9b9087; }
 
   .eligibility-message {
     margin-top: 1rem;
@@ -74,10 +37,11 @@
   .family-summary { margin-top: 1.5rem; padding: 1rem; border-radius: 10px; background: #f7f1ed; color: #5e524b; }
   .family-summary h3 { margin: 0 0 .5rem; font-size: 1.1rem; }
   .family-summary p { margin: .25rem 0; }
+  .family-summary-code { font-size: 0.9rem; color: #7a6d64; }
   .family-summary-members { margin-top: .75rem; font-size: .9rem; color: #5e524b; }
 
-  .submission-lock { margin-top: 1rem; padding: 1rem; border-radius: 8px; background: rgba(0, 123, 255, 0.12); border: 1px solid rgba(0, 123, 255, 0.25); color: #084298; }
-  
+  .last-updated { margin-top: 1rem; font-size: 0.9rem; color: #7a6d64; }
+
   .form-details { margin-top: 1.5rem; }
   .form-details label { display: block; margin-top: 1rem; font-weight: 600; color: #5e524b; }
   .form-details textarea {
@@ -121,28 +85,24 @@
 </style>
 
 <div class="rsvp-layout">
-  <!-- Admin override names (can submit for any family). Separate with | -->
-  <div class="rsvp-form" data-owner-names="Patricia Example|Mark Example">
+  <div class="rsvp-form">
     <form id="rsvp-form" autocomplete="off">
-      <div class="guest-search">
-        <label for="guest-search">Find your invitation (type the LEAD name)</label>
-        <input type="search" id="guest-search" placeholder="e.g., Mariel Jabillo" autocomplete="off">
-        <div class="search-results" id="guest-results" role="listbox" aria-label="Matches"></div>
-      </div>
+      <p class="rsvp-intro" id="intro-text">
+        Enter your family code on the welcome page to manage your RSVP.
+      </p>
 
       <div class="eligibility-message" id="eligibility-message" data-status="checking">
-        Type the family lead’s full name, then press Enter.
+        Waiting for a family code…
       </div>
 
       <div class="family-summary is-hidden" id="family-summary">
         <h3 id="family-summary-title"></h3>
         <p id="family-summary-count"></p>
+        <p id="family-summary-code" class="family-summary-code"></p>
         <div class="family-summary-members" id="family-summary-members"></div>
       </div>
 
-      <div class="submission-lock is-hidden" id="submission-lock">
-        We have already received this family's RSVP. For any changes in attendance, please contact the couple.
-      </div>
+      <div class="last-updated is-hidden" id="last-updated"></div>
 
       <div class="form-details is-hidden" id="form-details">
         <label for="notes">Notes (optional)</label>
@@ -153,7 +113,7 @@
           <div class="attendance-rows" id="attendance-rows"></div>
         </div>
 
-        <button type="submit" id="rsvp-submit" disabled>Send RSVP</button>
+        <button type="submit" id="rsvp-submit" disabled>Save RSVP</button>
       </div>
     </form>
   </div>
@@ -161,82 +121,69 @@
 
 <script>
 (() => {
-  /******** CONFIG ********/
-  const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec'; // e.g. https://script.google.com/macros/s/XXXX/exec
-  const CASE_INSENSITIVE = true;
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec';
 
-  /******** Elements ********/
-  const formWrapper   = document.querySelector('.rsvp-form');
+  const introText     = document.getElementById('intro-text');
   const form          = document.getElementById('rsvp-form');
-  const searchInput   = document.getElementById('guest-search');
-  const resultsBox    = document.getElementById('guest-results'); // kept for UI parity (optional)
   const statusBanner  = document.getElementById('eligibility-message');
   const famBox        = document.getElementById('family-summary');
   const famTitle      = document.getElementById('family-summary-title');
   const famCount      = document.getElementById('family-summary-count');
+  const famCode       = document.getElementById('family-summary-code');
   const famMembers    = document.getElementById('family-summary-members');
-  const lockBanner    = document.getElementById('submission-lock');
+  const lastUpdated   = document.getElementById('last-updated');
   const formDetails   = document.getElementById('form-details');
   const notesField    = document.getElementById('notes');
   const rowsContainer = document.getElementById('attendance-rows');
   const submitBtn     = document.getElementById('rsvp-submit');
 
-  /******** State ********/
   let currentFamily = null;
-  const ownerOverrides = new Set();
+  let familyCode = null;
+  let initialised = false;
 
-  // pick up admin names from data-owner-names and optional global override list
-  (function loadOwnerOverrides() {
-    if (formWrapper && formWrapper.dataset.ownerNames) {
-      formWrapper.dataset.ownerNames.split('|').forEach(n => {
-        const v = String(n || '').trim().toLowerCase();
-        if (v) ownerOverrides.add(v);
-      });
-    }
-    if (Array.isArray(window.RSVP_OWNER_OVERRIDES)) {
-      window.RSVP_OWNER_OVERRIDES.forEach(n => {
-        const v = String(n || '').trim().toLowerCase();
-        if (v) ownerOverrides.add(v);
-      });
-    }
-  })();
-
-  /******** Utils ********/
-  const norm = s => String(s || '').trim();
-  const normName = s => norm(s).toLowerCase();
+  const norm = (s) => String(s || '').trim();
+  const normName = (s) => norm(s).toLowerCase();
 
   function setBanner(kind, msg) {
     statusBanner.dataset.status = kind;
     statusBanner.textContent = msg;
   }
 
-  function showLock(msg) {
-    lockBanner.classList.remove('is-hidden');
-    lockBanner.textContent = msg || 'This family’s RSVP is already submitted.';
-    formDetails.classList.add('is-hidden');
-    submitBtn.disabled = true;
+  function setFormEnabled(enabled) {
+    submitBtn.disabled = !enabled;
   }
-  function hideLock() { lockBanner.classList.add('is-hidden'); }
-
-  function setFormEnabled(enabled) { submitBtn.disabled = !enabled; }
 
   function showFamily(f) {
     famBox.classList.remove('is-hidden');
     famTitle.textContent = `${f.leadName} — Family ID: ${f.familyId}`;
-    const members = f.members || [];
+    const members = Array.isArray(f.members) ? f.members : [];
     famCount.textContent = `Members on this invitation: ${members.length}`;
     famMembers.textContent = members.join(', ');
+    famCode.textContent = `Family code: ${familyCode}`;
   }
+
   function hideFamily() {
     famBox.classList.add('is-hidden');
     famTitle.textContent = '';
     famCount.textContent = '';
     famMembers.textContent = '';
+    famCode.textContent = '';
+  }
+
+  function showLastUpdated(date) {
+    if (!date) {
+      lastUpdated.classList.add('is-hidden');
+      lastUpdated.textContent = '';
+      return;
+    }
+    const dt = date instanceof Date ? date : new Date(date);
+    lastUpdated.textContent = `Last updated: ${dt.toLocaleString()}`;
+    lastUpdated.classList.remove('is-hidden');
   }
 
   function renderMemberRows(family) {
     rowsContainer.innerHTML = '';
-    (family.members || []).forEach(name => {
+    (family.members || []).forEach((name) => {
       const row = document.createElement('div');
       row.className = 'attendee-row';
 
@@ -257,136 +204,157 @@
     });
   }
 
-  async function apiGetFamily(lead) {
-    const url = API_BASE + `?action=getFamily&lead=${encodeURIComponent(lead)}`;
-    const res = await fetch(url, { method: 'GET' });
-    return res.json();
-  }
-
-  async function apiSubmit(payload) {
-    const res = await fetch(API_BASE, {
-      method: 'POST',
-      body: JSON.stringify(payload)
+  function applyStatuses(statuses) {
+    if (!Array.isArray(statuses)) return;
+    const map = new Map();
+    statuses.forEach((entry) => {
+      if (!entry || typeof entry.name !== 'string') return;
+      map.set(normName(entry.name), Boolean(entry.attending));
     });
-    return res.json();
-  }
 
-  function canSubmitFor(family, typedName) {
-    const isLead = CASE_INSENSITIVE
-      ? normName(family.leadName) === normName(typedName)
-      : norm(family.leadName) === norm(typedName);
-    return isLead || ownerOverrides.has(normName(typedName));
+    [...rowsContainer.children].forEach((row) => {
+      const key = normName(row.dataset.name);
+      if (!map.has(key)) return;
+      row.querySelector('select').value = map.get(key) ? 'yes' : 'no';
+    });
   }
 
   function collectStatuses() {
-    return [...rowsContainer.children].map(row => {
+    return [...rowsContainer.children].map((row) => {
       const name = row.dataset.name;
       const attending = row.querySelector('select').value === 'yes';
       return { name, attending };
     });
   }
 
-  /******** Search + Load ********/
-  async function handleSearch(typed) {
-    const q = norm(typed);
-    if (!q) {
-      setBanner('checking', 'Type the family lead’s full name, then press Enter.');
-      hideFamily(); hideLock(); setFormEnabled(false);
-      formDetails.classList.add('is-hidden');
-      currentFamily = null;
-      return;
+  function hydrateFamily(family, { fromCache = false } = {}) {
+    if (!family) return;
+    currentFamily = family;
+    renderMemberRows(family);
+    applyStatuses(family.statuses || []);
+    notesField.value = norm(family.notes);
+    showFamily(family);
+    showLastUpdated(family.submittedAt ? new Date(family.submittedAt) : null);
+
+    if (family.submittedAt && !fromCache) {
+      setBanner('info', 'Your previous responses are loaded. Update anything below and save to make changes.');
+    } else if (!fromCache) {
+      setBanner('ok', `Welcome ${family.leadName}! Please confirm each member below.`);
     }
 
-    setBanner('checking', 'Looking up your family invitation…');
-    hideLock(); setFormEnabled(false); formDetails.classList.add('is-hidden');
+    formDetails.classList.remove('is-hidden');
+    setFormEnabled(true);
+  }
+
+  async function fetchFamily(options = {}) {
+    if (!familyCode) return;
+    const message = Object.prototype.hasOwnProperty.call(options, 'message') ? options.message : 'Loading your RSVP…';
+    setFormEnabled(false);
+    if (message !== null) {
+      setBanner('checking', message || 'Loading your RSVP…');
+    }
 
     try {
-      const resp = await apiGetFamily(q);
-      if (!resp.ok) {
-        setBanner('error', resp.error || 'Lead not found. Please check spelling or contact the couple.');
-        hideFamily(); currentFamily = null;
-        return;
-      }
+      const res = await fetch(`${API_BASE}?action=getFamilyByCode&code=${encodeURIComponent(familyCode)}`);
+      const payload = await res.json();
 
-      const fam = resp.data || {};
-      currentFamily = fam;
-      showFamily(fam);
-
-      if (fam.submitted) {
-        showLock('This family’s RSVP has already been submitted. Please contact the couple for any changes.');
-        setBanner('info', 'RSVP already submitted.');
-        return;
-      }
-
-      if (!canSubmitFor(fam, q)) {
-        setBanner('info', `Only the designated family lead (${fam.leadName}) can submit the RSVP.`);
+      if (!payload.ok) {
+        setBanner('error', payload.error || 'We could not find that family code.');
+        hideFamily();
         formDetails.classList.add('is-hidden');
+        currentFamily = null;
+        setFormEnabled(false);
         return;
       }
 
-      // Render form for lead / admin
-      setBanner('ok', `Welcome ${fam.leadName}! Please confirm each member below.`);
-      renderMemberRows(fam);
-      formDetails.classList.remove('is-hidden');
-      setFormEnabled(true);
+      const family = payload.data || {};
+      hydrateFamily(family);
+      sessionStorage.setItem('RSVP_FAMILY_CACHE', JSON.stringify(family));
     } catch (err) {
       console.error(err);
-      setBanner('error', 'Something went wrong while loading. Please try again or contact the couple.');
-      hideFamily(); hideLock();
-      currentFamily = null;
+      setBanner('error', 'Something went wrong while loading. Please try again.');
+      setFormEnabled(true);
     }
   }
 
-  // Press Enter to search; blur also triggers.
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); handleSearch(searchInput.value); }
-  });
-  searchInput.addEventListener('change', () => handleSearch(searchInput.value));
-  // optional: hide suggestions panel if present
-  searchInput.addEventListener('blur', () => setTimeout(() => resultsBox?.classList?.remove('is-visible'), 150));
+  function init() {
+    if (initialised) return;
+    initialised = true;
 
-  /******** Submit ********/
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!currentFamily) { setBanner('error', 'Please look up the lead name first.'); return; }
+    familyCode = sessionStorage.getItem('RSVP_FAMILY_CODE');
+    const cached = sessionStorage.getItem('RSVP_FAMILY_CACHE');
 
-    const typedName = norm(searchInput.value);
-    if (!canSubmitFor(currentFamily, typedName)) {
-      setBanner('error', `Only ${currentFamily.leadName} (or an admin) can submit this RSVP.`);
+    if (!familyCode) {
+      setBanner('error', 'Please return to the welcome page and enter your family code to RSVP.');
+      introText.textContent = 'Enter your family code on the welcome page to manage your RSVP.';
+      setFormEnabled(false);
+      hideFamily();
+      formDetails.classList.add('is-hidden');
+      return;
+    }
+
+    introText.textContent = 'Review your family details below, make any updates, and save when you are ready.';
+
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        hydrateFamily(parsed, { fromCache: true });
+        setBanner('info', 'Showing the most recent details saved on this device…');
+      } catch (err) {
+        console.warn('Unable to parse cached family data', err);
+      }
+    }
+
+    const message = cached ? 'Refreshing your RSVP…' : 'Loading your RSVP…';
+    fetchFamily({ message });
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!currentFamily || !familyCode) {
+      setBanner('error', 'Please enter your family code on the welcome page to begin.');
       return;
     }
 
     const statuses = collectStatuses();
-    if (!statuses.length) { setBanner('error', 'No members to submit.'); return; }
+    if (!statuses.length) {
+      setBanner('error', 'We could not find any members on this invitation.');
+      return;
+    }
 
-    submitBtn.disabled = true;
+    const payload = {
+      familyId: currentFamily.familyId,
+      code: familyCode,
+      notes: norm(notesField.value),
+      statuses,
+    };
+
+    setFormEnabled(false);
+    setBanner('checking', 'Saving your RSVP…');
+
     try {
-      const payload = {
-        familyId: currentFamily.familyId,
-        leadName: currentFamily.leadName,
-        notes: norm(notesField.value),
-        statuses
-      };
-      const resp = await apiSubmit(payload);
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
 
-      if (!resp.ok) {
-        if (resp.locked) {
-          showLock(resp.message || 'This family’s RSVP is already submitted.');
-          setBanner('info', 'RSVP already submitted.');
-        } else {
-          setBanner('error', resp.error || 'Unable to submit. Please try again.');
-          submitBtn.disabled = false;
-        }
+      if (!data.ok) {
+        setBanner('error', data.error || 'Unable to save your RSVP right now.');
+        setFormEnabled(true);
         return;
       }
 
-      setBanner('ok', 'RSVP submitted. Thank you!');
-      showLock('RSVP submitted. If anything changes, please contact the couple.');
+      setBanner('ok', 'Thank you! Your RSVP has been saved.');
+      await fetchFamily({ message: null });
     } catch (err) {
       console.error(err);
-      setBanner('error', 'Submission failed. Please try again or contact the couple.');
-      submitBtn.disabled = false;
+      setBanner('error', 'Submission failed. Please try again.');
+      setFormEnabled(true);
     }
   });
+
+  init();
 })();
 </script>

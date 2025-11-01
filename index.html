@@ -9,7 +9,7 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Lancelot', cursive;
       background: #f9f7f5;
       color: #333;
       display: flex;
@@ -20,7 +20,7 @@
       text-align: center;
     }
     h2 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Libre Baskerville', serif;
       font-size: 1.8rem;
       color: #5e524b;
       margin-bottom: 1rem;
@@ -53,20 +53,52 @@
 </head>
 <body>
   <h2> 06 - 08 - 26 💕</h2>
-  <input type="password" id="pw" placeholder="Enter passcode" />
-  <button onclick="checkPW()">Enter</button>
-  <p id="error"></p>
+  <input type="text" id="access-code" placeholder="Enter your family's unique code" autocomplete="one-time-code" />
+  <button id="enter-btn">Enter</button>
+  <p id="error" role="alert"></p>
 
   <script>
-    function checkPW() {
-      const password = document.getElementById('pw').value;
-      const correct = 'patriciaandmark060826';
-      if (password === correct) {
-        window.location.href = 'main.html';
-      } else {
-        document.getElementById('error').textContent = 'Incorrect password 😢';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec';
+
+    async function validateCode() {
+      const input = document.getElementById('access-code');
+      const errorBox = document.getElementById('error');
+      const rawCode = input.value.trim();
+
+      errorBox.textContent = '';
+
+      if (!rawCode) {
+        errorBox.textContent = 'Please enter the code that was shared with your family.';
+        input.focus();
+        return;
+      }
+
+      errorBox.textContent = 'Checking code…';
+
+      try {
+        const res = await fetch(`${API_BASE}?action=getFamilyByCode&code=${encodeURIComponent(rawCode)}`);
+        const payload = await res.json();
+
+        if (!payload.ok) {
+          errorBox.textContent = payload.error || 'That code did not match our list. Please try again or contact the couple.';
+          return;
+        }
+
+        sessionStorage.setItem('RSVP_FAMILY_CODE', rawCode);
+        sessionStorage.setItem('RSVP_FAMILY_CACHE', JSON.stringify(payload.data || {}));
+        window.location.href = 'main.html?page=rsvp';
+      } catch (err) {
+        console.error(err);
+        errorBox.textContent = 'We could not verify that code. Please check your connection and try again.';
       }
     }
+
+    document.getElementById('enter-btn').addEventListener('click', validateCode);
+    document.getElementById('access-code').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        validateCode();
+      }
+    });
   </script>
 </body>
 </html>
