@@ -17,9 +17,33 @@ function _getSheet(name) {
   return sh;
 }
 
+function _normalizeHeader(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
 function _getHeaderMap(sheet) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] || [];
-  return Object.fromEntries(headers.map((h, i) => [String(h).trim(), i + 1]));
+  return headers.reduce((map, header, idx) => {
+    const normalized = _normalizeHeader(header);
+    if (normalized && !map.hasOwnProperty(normalized)) {
+      map[normalized] = idx + 1;
+    }
+    return map;
+  }, {});
+}
+
+function _resolveColumn(headerMap, ...candidates) {
+  for (let i = 0; i < candidates.length; i += 1) {
+    const candidate = candidates[i];
+    if (!candidate) continue;
+    const normalized = _normalizeHeader(candidate);
+    if (normalized && headerMap.hasOwnProperty(normalized)) {
+      return headerMap[normalized];
+    }
+  }
+  return null;
 }
 
 function _nowISO() {
@@ -55,18 +79,31 @@ function _readRoster() {
   const values = sh.getDataRange().getValues();
   if (!values.length) return [];
 
-  const headers = values.shift().map((h) => String(h).trim());
-  const index = Object.fromEntries(headers.map((h, i) => [h, i]));
+  const headerMap = _getHeaderMap(sh);
 
-  return values.map((row, rowIdx) => ({
+  const familyIdCol = _resolveColumn(headerMap, 'FamilyID', 'Family Id', 'Family');
+  const leadNameCol = _resolveColumn(headerMap, 'LeadName', 'Lead Name', 'Primary Contact');
+  const leadEmailCol = _resolveColumn(headerMap, 'LeadEmail', 'Lead Email');
+  const membersCol = _resolveColumn(headerMap, 'Members', 'Guest Names', 'Guests');
+  const uniqueCodeCol = _resolveColumn(headerMap, 'UniqueCode', 'FamilyCode', 'Code', 'Access Code');
+  const submittedCol = _resolveColumn(headerMap, 'Submitted', 'RSVPSubmitted', 'Responded');
+  const submittedAtCol = _resolveColumn(headerMap, 'SubmittedAt', 'Submitted At', 'LastUpdated', 'UpdatedAt');
+
+  if (!familyIdCol || !leadNameCol || !membersCol || !uniqueCodeCol) {
+    throw new Error('Missing required columns in roster sheet.');
+  }
+
+  const dataRows = values.slice(1);
+
+  return dataRows.map((row, rowIdx) => ({
     rowIndex: rowIdx + 2,
-    FamilyID: row[index['FamilyID']],
-    LeadName: row[index['LeadName']],
-    LeadEmail: row[index['LeadEmail']],
-    Members: _parseMembers(row[index['Members']]),
-    UniqueCode: index.hasOwnProperty('UniqueCode') ? row[index['UniqueCode']] : '',
-    Submitted: String(row[index['Submitted']] || '').toUpperCase() === 'TRUE',
-    SubmittedAt: row[index['SubmittedAt']] || ''
+    FamilyID: row[familyIdCol - 1],
+    LeadName: row[leadNameCol - 1],
+    LeadEmail: leadEmailCol ? row[leadEmailCol - 1] : '',
+    Members: _parseMembers(row[membersCol - 1]),
+    UniqueCode: uniqueCodeCol ? row[uniqueCodeCol - 1] : '',
+    Submitted: submittedCol ? String(row[submittedCol - 1] || '').toUpperCase() === 'TRUE' : false,
+    SubmittedAt: submittedAtCol ? row[submittedAtCol - 1] || '' : ''
   }));
 }
 
@@ -97,8 +134,8 @@ function _appendResponses(familyID, leadName, notes, statuses) {
 function _writeSubmissionStatus(rowIndex, submittedAt) {
   const sh = _getSheet(SHEET_ROSTER);
   const headerMap = _getHeaderMap(sh);
-  const submittedCol = headerMap['Submitted'];
-  const submittedAtCol = headerMap['SubmittedAt'];
+  const submittedCol = _resolveColumn(headerMap, 'Submitted', 'RSVPSubmitted', 'Responded');
+  const submittedAtCol = _resolveColumn(headerMap, 'SubmittedAt', 'Submitted At', 'LastUpdated', 'UpdatedAt');
 
   if (submittedCol) {
     sh.getRange(rowIndex, submittedCol).setValue(true);
@@ -114,28 +151,41 @@ function _readLatestSubmission(familyID) {
     return { statuses: [], notes: '', submittedAt: null };
   }
 
-  const rows = sh.getRange(2, 1, sh.getLastRow() - 1, 6).getValues();
-  const byFamily = rows.filter((row) => String(row[1]) === String(familyID));
+  const headerMap = _getHeaderMap(sh);
+  const timestampCol = _resolveColumn(headerMap, 'Timestamp', 'SubmittedAt');
+  const familyIdCol = _resolveColumn(headerMap, 'FamilyID', 'Family Id', 'Family');
+  const personNameCol = _resolveColumn(headerMap, 'PersonName', 'Name', 'Guest');
+  const attendingCol = _resolveColumn(headerMap, 'Attending', 'Response', 'RSVP');
+  const notesCol = _resolveColumn(headerMap, 'Notes', 'Comments', 'Message');
+
+  const width = sh.getLastColumn();
+  const rows = sh.getRange(2, 1, sh.getLastRow() - 1, width).getValues();
+  const byFamily = familyIdCol
+    ? rows.filter((row) => String(row[familyIdCol - 1]) === String(familyID))
+    : [];
   if (!byFamily.length) {
     return { statuses: [], notes: '', submittedAt: null };
   }
 
   const grouped = new Map();
   byFamily.forEach((row) => {
-    const rawTs = row[0];
+    const rawTs = timestampCol ? row[timestampCol - 1] : null;
     const tsDate = _toDate(rawTs);
     if (!tsDate) return;
     const key = tsDate.getTime();
     if (!grouped.has(key)) {
-      grouped.set(key, { notes: row[5] || '', statuses: [] });
+      grouped.set(key, { notes: notesCol ? row[notesCol - 1] || '' : '', statuses: [] });
     }
     const bucket = grouped.get(key);
-    if (row[5]) {
-      bucket.notes = row[5];
+    if (notesCol && row[notesCol - 1]) {
+      bucket.notes = row[notesCol - 1];
     }
+    const personName = personNameCol ? row[personNameCol - 1] : '';
+    if (!personName) return;
+    const attendingValue = attendingCol ? row[attendingCol - 1] : '';
     bucket.statuses.push({
-      name: row[2],
-      attending: String(row[3]).toLowerCase() === 'yes'
+      name: personName,
+      attending: String(attendingValue).toLowerCase() === 'yes'
     });
   });
 
