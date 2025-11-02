@@ -153,6 +153,7 @@
     .gift-links {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 0.75rem;
       margin-top: 0.75rem;
     }
@@ -162,9 +163,28 @@
       background: rgba(216, 195, 180, 0.4);
       padding: 0.5rem 1rem;
       border-radius: 999px;
+      align-items: center;
       font-size: 0.95rem;
       letter-spacing: 0.02em;
       color: var(--color-heading);
+    }
+    
+    .map-label {
+      font-family: 'Libre Baskerville', serif;
+      font-weight: 600;
+      color: #5e524b;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .map-embed {
+      border: 1px solid #d8c3b4;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      height: 400px;
+      display: block;
+      margin: 0 auto;
     }
 
     .gift-grid {
@@ -277,9 +297,7 @@
             <p class="map-label">📍 Google Maps</p>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6561.841943781868!2d121.04126107684452!3d14.5601861780613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c857e1d4aeb1%3A0xe27fbc1e63d58f00!2sIglesia%20Ni%20Cristo%20%5BMakati%5D%20-%20Guadalupe!5e1!3m2!1sen!2sph!4v1762075749980!5m2!1sen!2sph"
-              width="600"
-              height="450"
-              style="border:0;"
+              class="map-embed"
               allowfullscreen
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
@@ -291,8 +309,7 @@
             <p class="map-label">🗺️ Waze Directions</p>
             <iframe
               src="https://embed.waze.com/iframe?zoom=16&lat=14.560177&lon=121.043739&ct=livemap"
-              width="600"
-              height="450"
+              class="map-embed"
               allowfullscreen
               title="Waze map for Iglesia Ni Cristo Guadalupe">
             </iframe>
