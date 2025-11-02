@@ -3,18 +3,18 @@
   <text x="200" y="45" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="20" fill="#5f524c">Dress Code Inspiration</text>
   <g transform="translate(50,80)">
     <rect width="60" height="100" fill="#d8c3b4" rx="10"/>
-    <text x="30" y="120" text-anchor="middle" font-family="'Lancelot', cursive" font-size="16" fill="#5f524c">Taupe</text>
+    <text x="30" y="120" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="16" fill="#5f524c">Taupe</text>
   </g>
   <g transform="translate(140,80)">
     <rect width="60" height="100" fill="#f2d6bf" rx="10"/>
-    <text x="30" y="120" text-anchor="middle" font-family="'Lancelot', cursive" font-size="16" fill="#5f524c">Blush</text>
+    <text x="30" y="120" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="16" fill="#5f524c">Blush</text>
   </g>
   <g transform="translate(230,80)">
     <rect width="60" height="100" fill="#f9eee2" rx="10"/>
-    <text x="30" y="120" text-anchor="middle" font-family="'Lancelot', cursive" font-size="16" fill="#5f524c">Cream</text>
+    <text x="30" y="120" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="16" fill="#5f524c">Cream</text>
   </g>
   <g transform="translate(320,80)">
     <rect width="60" height="100" fill="#bfa89f" rx="10"/>
-    <text x="30" y="120" text-anchor="middle" font-family="'Lancelot', cursive" font-size="16" fill="#f7f2ec">Mocha</text>
+    <text x="30" y="120" text-anchor="middle" font-family="'Libre Baskerville', serif" font-size="16" fill="#f7f2ec">Mocha</text>
   </g>
 </svg>

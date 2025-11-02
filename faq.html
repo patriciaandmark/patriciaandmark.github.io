@@ -142,6 +142,13 @@
       text-align: center;
     }
 
+    .faq-answer figure img {
+      display: inline-block;
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+    }
+
     .faq-answer figcaption {
       margin-top: 0.75rem;
       font-size: 0.95rem;
@@ -401,7 +408,10 @@
       <div class="faq-answer">
         Dressy and dreamy formal or semi formal wear in <strong>soft earthy tones</strong>.
         <figure>
-          <img src="./resources/dress-code-palette.png" alt="Sample palette for the dress code with taupe, blush, cream, and mocha swatches." loading="lazy" width="320" height="200">
+          <picture>
+            <source srcset="./resources/dress-code-palette.svg" type="image/svg+xml">
+            <img src="./resources/dress-code-palette.png" alt="Sample palette for the dress code with taupe, blush, cream, and mocha swatches." loading="lazy" width="400" height="250">
+          </picture>
           <figcaption>Save this palette for outfit planning inspiration.</figcaption>
         </figure>
       </div>
