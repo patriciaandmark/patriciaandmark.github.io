@@ -149,7 +149,6 @@
       color: var(--color-text);
     }
 
-    .map-links,
     .gift-links {
       display: flex;
       flex-wrap: wrap;
@@ -158,7 +157,6 @@
       margin-top: 0.75rem;
     }
 
-    .map-links a,
     .gift-links a {
       background: rgba(216, 195, 180, 0.4);
       padding: 0.5rem 1rem;
@@ -168,6 +166,22 @@
       letter-spacing: 0.02em;
       color: var(--color-heading);
     }
+
+    .map-container {
+      background: #fefaf7;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(94, 82, 75, 0.12);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .map-frame {
+      margin-bottom: 2rem;
+    }
     
     .map-label {
       font-family: 'Libre Baskerville', serif;
@@ -176,15 +190,14 @@
       margin-bottom: 0.75rem;
       font-size: 1rem;
     }
-
+    
     .map-embed {
       border: 1px solid #d8c3b4;
       border-radius: 8px;
-      width: 90%;
-      max-width: 600px;
+      width: 100%;
       height: 400px;
       display: block;
-      margin: 0 auto;
+      box-shadow: 0 2px 6px rgba(216, 195, 180, 0.25);
     }
 
     .gift-grid {
@@ -244,7 +257,11 @@
       font-family: 'Libre Baskerville', serif;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
+      .map-embed {
+        height: 300px;
+      }
+
       .faq-wrapper {
         padding: 2rem 1.25rem 3rem;
       }
@@ -292,7 +309,7 @@
           <span>1212 Nuestra Del Carmen, Makati City</span>
           <span>This is an indoor church wedding ceremony and parking is available for guests.</span>
         </div>
-        <div class="map-links">
+        <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 Google Maps</p>
             <iframe
@@ -314,6 +331,8 @@
               title="Waze map for Iglesia Ni Cristo Guadalupe">
             </iframe>
           </div>
+        </div>
+
         </div>
       </div>
     </details>
