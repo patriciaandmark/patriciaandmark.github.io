@@ -121,13 +121,13 @@
       <div class="last-updated is-hidden" id="last-updated"></div>
 
       <div class="form-details is-hidden" id="form-details">
-        <label for="notes">Notes (optional)</label>
-        <textarea id="notes" placeholder="Dietary needs, seating, etc."></textarea>
-
         <div class="attendee-selector">
           <p class="attendee-instructions">Confirm attendance for each member below.</p>
           <div class="attendance-rows" id="attendance-rows"></div>
         </div>
+
+        <label for="notes">Notes (optional)</label>
+        <textarea id="notes" placeholder="Dietary needs, allergies, etc."></textarea>
 
         <button type="submit" id="rsvp-submit" disabled>Save RSVP</button>
       </div>
@@ -309,7 +309,7 @@
       return;
     }
 
-    introText.textContent = 'Review your family details below, make any updates, and save when you are ready.';
+    introText.textContent = 'Review your RSVP details below, make any updates, and save when you are ready.';
 
     if (cached) {
       try {
