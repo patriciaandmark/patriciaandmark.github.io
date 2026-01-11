@@ -33,6 +33,39 @@
     margin-top: 2rem;
     color: var(--color-text);
   }
+
+  .rsvp-status {
+    margin: 1.75rem auto 0;
+    padding: 1.25rem 1.5rem;
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 16px;
+    border: 1px solid rgba(216, 195, 180, 0.45);
+    box-shadow: 0 6px 18px rgba(94, 82, 75, 0.08);
+  }
+
+  .rsvp-status p {
+    margin: 0 0 1rem;
+  }
+
+  .rsvp-status button {
+    background: #d8c3b4;
+    color: #5e524b;
+    border: none;
+    padding: 0.65rem 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .rsvp-status button:hover {
+    background: #cbb4a5;
+    transform: translateY(-1px);
+  }
+
+  .is-hidden { display: none; }
 </style>
 
 <img class="hero-photo" src="resources/welcome-photo.jpg" alt="Patricia and Mark" />
@@ -41,13 +74,21 @@
 <p>Patricia &amp; Mark — June 8, 2026</p>
 
 <div id="countdown" class="countdown">Loading countdown...</div>
+<div id="rsvp-status" class="rsvp-status is-hidden">
+  <p id="rsvp-status-message"></p>
+  <button id="rsvp-status-button" type="button">Go to RSVP</button>
+</div>
 
 <script>
   (function() {
     const countdownElement = document.getElementById('countdown');
+    const statusCard = document.getElementById('rsvp-status');
+    const statusMessage = document.getElementById('rsvp-status-message');
+    const statusButton = document.getElementById('rsvp-status-button');
     if (!countdownElement) return;
 
     const weddingDate = new Date('2026-06-08T00:00:00');
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec';
 
     function updateCountdown() {
       const now = new Date();
@@ -65,5 +106,68 @@
 
     setInterval(updateCountdown, 1000);
     updateCountdown();
+
+    function goToRsvp() {
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo('rsvp');
+      } else {
+        window.location.href = 'main.html?page=rsvp';
+      }
+    }
+
+    function showStatus(message, buttonLabel) {
+      if (!statusCard) return;
+      statusMessage.textContent = message;
+      statusButton.textContent = buttonLabel;
+      statusButton.onclick = goToRsvp;
+      statusCard.classList.remove('is-hidden');
+    }
+
+    async function loadRsvpStatus() {
+      const familyCode = sessionStorage.getItem('RSVP_FAMILY_CODE');
+      if (!familyCode) {
+        return;
+      }
+
+      showStatus('Checking your RSVP status…', 'Go to RSVP');
+
+      const cached = sessionStorage.getItem('RSVP_FAMILY_CACHE');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed) {
+            const hasSubmitted = Boolean(parsed.submittedAt);
+            showStatus(
+              hasSubmitted
+                ? 'We already have your RSVP on file. Need to update it?'
+                : 'Looks like you have not RSVP’d yet. We would love to hear from you!',
+              hasSubmitted ? 'Edit RSVP' : 'RSVP Now'
+            );
+          }
+        } catch (err) {
+          console.warn('Unable to read cached RSVP status.', err);
+        }
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}?action=getFamilyByCode&code=${encodeURIComponent(familyCode)}`);
+        const payload = await res.json();
+        if (!payload.ok) return;
+
+        const family = payload.data || {};
+        sessionStorage.setItem('RSVP_FAMILY_CACHE', JSON.stringify(family));
+        const hasSubmitted = Boolean(family.submittedAt);
+        showStatus(
+          hasSubmitted
+            ? 'We already have your RSVP on file. Need to update it?'
+            : 'Looks like you have not RSVP’d yet. We would love to hear from you!',
+          hasSubmitted ? 'Edit RSVP' : 'RSVP Now'
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadRsvpStatus();
   })();
 </script>

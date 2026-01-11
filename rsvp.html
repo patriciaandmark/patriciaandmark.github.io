@@ -98,6 +98,44 @@
   .rsvp-form button[type="submit"]:disabled { background-color: rgba(216, 195, 180, 0.6); cursor: not-allowed; color: rgba(94, 82, 75, 0.65); }
 
   .is-hidden { display: none !important; }
+
+  .dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(249, 244, 240, 0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+
+  .dialog-card {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 12px 28px rgba(94, 82, 75, 0.18);
+    text-align: center;
+    max-width: 420px;
+    width: min(90%, 420px);
+  }
+
+  .dialog-card h3 {
+    margin: 0 0 0.75rem;
+  }
+
+  .dialog-card p {
+    margin: 0 0 1.5rem;
+  }
+
+  .dialog-card button {
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-family: var(--font-heading);
+    cursor: pointer;
+  }
 </style>
 
 <div class="rsvp-layout">
@@ -135,6 +173,14 @@
   </div>
 </div>
 
+<div class="dialog-overlay is-hidden" id="rsvp-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <div class="dialog-card">
+    <h3 id="dialog-title">RSVP Status</h3>
+    <p id="dialog-message"></p>
+    <button type="button" id="dialog-ok">OK</button>
+  </div>
+</div>
+
 <script>
 (() => {
   const API_BASE = 'https://script.google.com/macros/s/AKfycbx_HyBsd8mrLj4yi2O4XrKpYl8B2FDQMW2l9lL9xgLrPXObo-0r6da10rwamir_hNEo/exec';
@@ -152,6 +198,10 @@
   const notesField    = document.getElementById('notes');
   const rowsContainer = document.getElementById('attendance-rows');
   const submitBtn     = document.getElementById('rsvp-submit');
+  const dialog        = document.getElementById('rsvp-dialog');
+  const dialogTitle   = document.getElementById('dialog-title');
+  const dialogMessage = document.getElementById('dialog-message');
+  const dialogOk      = document.getElementById('dialog-ok');
 
   let currentFamily = null;
   let familyCode = null;
@@ -210,6 +260,7 @@
       const sel = document.createElement('select');
       sel.className = 'attendee-select';
       sel.innerHTML = `
+        <option value="" selected>Select...</option>
         <option value="yes">Attending</option>
         <option value="no">Not attending</option>
       `;
@@ -238,9 +289,27 @@
   function collectStatuses() {
     return [...rowsContainer.children].map((row) => {
       const name = row.dataset.name;
-      const attending = row.querySelector('select').value === 'yes';
-      return { name, attending };
+      const choice = row.querySelector('select').value;
+      return { name, attending: choice === 'yes', choice };
     });
+  }
+
+  function showDialog({ title, message }) {
+    dialogTitle.textContent = title;
+    dialogMessage.textContent = message;
+    dialog.classList.remove('is-hidden');
+  }
+
+  function hideDialog() {
+    dialog.classList.add('is-hidden');
+  }
+
+  function goToFaq() {
+    if (typeof window.navigateTo === 'function') {
+      window.navigateTo('faq');
+    } else {
+      window.location.href = 'main.html?page=faq';
+    }
   }
 
   function hydrateFamily(family, { fromCache = false } = {}) {
@@ -332,7 +401,14 @@
       return;
     }
 
-    const statuses = collectStatuses();
+    const rawStatuses = collectStatuses();
+    const missing = rawStatuses.find((status) => status.choice === '');
+    if (missing) {
+      setBanner('error', 'Please select attending or not attending for each guest.');
+      return;
+    }
+
+    const statuses = rawStatuses.map(({ name, attending }) => ({ name, attending }));
     if (!statuses.length) {
       setBanner('error', 'We could not find any members on this invitation.');
       return;
@@ -371,16 +447,33 @@
       if (!data.ok) {
         setBanner('error', data.error || 'Unable to save your RSVP right now.');
         setFormEnabled(true);
+        showDialog({
+          title: 'RSVP Failed',
+          message: data.error || 'We could not save your RSVP. Please try again.',
+        });
         return;
       }
 
       setBanner('ok', 'Thank you! Your RSVP has been saved.');
       await fetchFamily({ message: null });
+      showDialog({
+        title: 'RSVP Saved',
+        message: 'Your RSVP has been saved successfully.',
+      });
     } catch (err) {
       console.error(err);
       setBanner('error', 'Submission failed. Please try again.');
       setFormEnabled(true);
+      showDialog({
+        title: 'RSVP Failed',
+        message: 'We could not save your RSVP. Please try again.',
+      });
     }
+  });
+
+  dialogOk.addEventListener('click', () => {
+    hideDialog();
+    goToFaq();
   });
 
   init();
