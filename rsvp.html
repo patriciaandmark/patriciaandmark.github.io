@@ -206,6 +206,8 @@
   let currentFamily = null;
   let familyCode = null;
   let initialised = false;
+  let dialogAction = null;
+  let redirectTimer = null;
 
   const norm = (s) => String(s || '').trim();
   const normName = (s) => norm(s).toLowerCase();
@@ -294,14 +296,18 @@
     });
   }
 
-  function showDialog({ title, message }) {
+  function showDialog({ title, message, confirmText = 'OK', showButton = true, onConfirm = null }) {
     dialogTitle.textContent = title;
     dialogMessage.textContent = message;
+    dialogOk.textContent = confirmText;
+    dialogOk.classList.toggle('is-hidden', !showButton);
+    dialogAction = onConfirm;
     dialog.classList.remove('is-hidden');
   }
 
   function hideDialog() {
     dialog.classList.add('is-hidden');
+    dialogAction = null;
   }
 
   function goToFaq() {
@@ -423,6 +429,11 @@
 
     setFormEnabled(false);
     setBanner('checking', 'Saving your RSVP…');
+    showDialog({
+      title: 'Saving your RSVP',
+      message: 'Please wait while we save your updates.',
+      showButton: false,
+    });
 
     try {
       const res = await fetch(API_BASE, {
@@ -458,8 +469,15 @@
       await fetchFamily({ message: null });
       showDialog({
         title: 'RSVP Saved',
-        message: 'Your RSVP has been saved successfully.',
+        message: 'Your RSVP has been saved successfully. Redirecting to the FAQ…',
+        showButton: false,
       });
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+      redirectTimer = setTimeout(() => {
+        goToFaq();
+      }, 1600);
     } catch (err) {
       console.error(err);
       setBanner('error', 'Submission failed. Please try again.');
@@ -467,13 +485,16 @@
       showDialog({
         title: 'RSVP Failed',
         message: 'We could not save your RSVP. Please try again.',
+        onConfirm: () => {},
       });
     }
   });
 
   dialogOk.addEventListener('click', () => {
     hideDialog();
-    goToFaq();
+    if (typeof dialogAction === 'function') {
+      dialogAction();
+    }
   });
 
   init();
