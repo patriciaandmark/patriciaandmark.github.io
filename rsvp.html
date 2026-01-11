@@ -223,7 +223,7 @@
 
   function showFamily(f) {
     famBox.classList.remove('is-hidden');
-    famTitle.textContent = `Hello ${f.leadName}!`;
+    famTitle.textContent = `Hello!`;
     const members = Array.isArray(f.members) ? f.members : [];
     famCount.textContent = `Members on this invitation: ${members.length}`;
     famMembers.textContent = members.join(', ');
@@ -330,7 +330,7 @@
     if (family.submittedAt && !fromCache) {
       setBanner('info', 'Your previous responses are loaded. Update anything below and save to make changes.');
     } else if (!fromCache) {
-      setBanner('ok', `Welcome ${family.leadName}! Please confirm each member below.`);
+      setBanner('ok', `Please confirm each member below.`);
     }
 
     formDetails.classList.remove('is-hidden');
