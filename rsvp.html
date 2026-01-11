@@ -51,7 +51,6 @@
   .family-summary h3 { margin: 0 0 .5rem; font-size: 1.1rem; font-family: var(--font-heading); text-transform: uppercase; letter-spacing: 0.08em; }
   .family-summary p { margin: .25rem 0; }
   .family-summary-code { font-size: 0.9rem; color: var(--color-text); }
-  .family-summary-members { margin-top: .75rem; font-size: .9rem; color: var(--color-text); }
 
   .last-updated { margin-top: 1rem; font-size: 0.9rem; color: var(--color-text); }
 
@@ -142,25 +141,24 @@
   <div class="rsvp-form">
     <form id="rsvp-form" autocomplete="off">
       <p class="rsvp-intro" id="intro-text">
-        Enter your invite code on the home page to manage your RSVP.
+        Enter your invite code on the home page.
       </p>
 
       <div class="eligibility-message" id="eligibility-message" data-status="checking">
-        Waiting for a invite code…
+        Waiting for invite code…
       </div>
 
       <div class="family-summary is-hidden" id="family-summary">
         <h3 id="family-summary-title"></h3>
         <p id="family-summary-count"></p>
         <p id="family-summary-code" class="family-summary-code"></p>
-        <div class="family-summary-members" id="family-summary-members"></div>
       </div>
 
       <div class="last-updated is-hidden" id="last-updated"></div>
 
       <div class="form-details is-hidden" id="form-details">
         <div class="attendee-selector">
-          <p class="attendee-instructions">Confirm attendance for each member below.</p>
+          <p class="attendee-instructions">Confirm attendance for each guest.</p>
           <div class="attendance-rows" id="attendance-rows"></div>
         </div>
 
@@ -192,7 +190,6 @@
   const famTitle      = document.getElementById('family-summary-title');
   const famCount      = document.getElementById('family-summary-count');
   const famCode       = document.getElementById('family-summary-code');
-  const famMembers    = document.getElementById('family-summary-members');
   const lastUpdated   = document.getElementById('last-updated');
   const formDetails   = document.getElementById('form-details');
   const notesField    = document.getElementById('notes');
@@ -227,7 +224,6 @@
     famTitle.classList.add('is-hidden');
     const members = Array.isArray(f.members) ? f.members : [];
     famCount.textContent = `Members on this invitation: ${members.length}`;
-    famMembers.textContent = members.join(', ');
     // famCode.textContent = `Family code: ${familyCode}`;
   }
 
@@ -236,7 +232,6 @@
     famTitle.textContent = '';
     famTitle.classList.add('is-hidden');
     famCount.textContent = '';
-    famMembers.textContent = '';
     famCode.textContent = '';
   }
 
@@ -330,9 +325,9 @@
     showLastUpdated(family.submittedAt ? new Date(family.submittedAt) : null);
 
     if (family.submittedAt && !fromCache) {
-      setBanner('info', 'Your previous responses are loaded. Update anything below and save to make changes.');
+      setBanner('info', 'Responses loaded. Update and save.');
     } else if (!fromCache) {
-      setBanner('ok', `Please confirm each member below.`);
+      setBanner('ok', 'Confirm each guest.');
     }
 
     formDetails.classList.remove('is-hidden');
@@ -341,16 +336,16 @@
 
   async function fetchFamily(options = {}) {
     if (!familyCode) return;
-    const message = Object.prototype.hasOwnProperty.call(options, 'message') ? options.message : 'Loading your RSVP…';
+    const message = Object.prototype.hasOwnProperty.call(options, 'message') ? options.message : 'Loading RSVP…';
     const shouldShowDialog = Object.prototype.hasOwnProperty.call(options, 'showDialog') ? options.showDialog : true;
     setFormEnabled(false);
     if (message !== null) {
-      setBanner('checking', message || 'Loading your RSVP…');
+      setBanner('checking', message || 'Loading RSVP…');
     }
     if (shouldShowDialog) {
       showDialog({
-        title: 'Refreshing RSVP',
-        message: message || 'Refreshing your RSVP…',
+        title: 'Refreshing',
+        message: message || 'Refreshing RSVP…',
         showButton: false,
       });
     }
@@ -360,7 +355,7 @@
       const payload = await res.json();
 
       if (!payload.ok) {
-        setBanner('error', payload.error || 'We could not find that invite code.');
+        setBanner('error', payload.error || 'Invite code not found.');
         hideFamily();
         formDetails.classList.add('is-hidden');
         currentFamily = null;
@@ -373,7 +368,7 @@
       sessionStorage.setItem('RSVP_FAMILY_CACHE', JSON.stringify(family));
     } catch (err) {
       console.error(err);
-      setBanner('error', 'Something went wrong while loading. Please try again.');
+      setBanner('error', 'Load failed. Try again.');
       setFormEnabled(true);
     } finally {
       if (shouldShowDialog) {
@@ -390,8 +385,8 @@
     const cached = sessionStorage.getItem('RSVP_FAMILY_CACHE');
 
     if (!familyCode) {
-      setBanner('error', 'Please return to the home page and enter your invite code to RSVP.');
-      introText.textContent = 'Enter your invite code on the home page to manage your RSVP.';
+      setBanner('error', 'Enter your invite code on the home page.');
+      introText.textContent = 'Enter your invite code on the home page.';
       setFormEnabled(false);
       hideFamily();
       formDetails.classList.add('is-hidden');
@@ -404,39 +399,39 @@
       return;
     }
 
-    introText.textContent = 'Review your RSVP details below, make any updates, and save when you are ready.';
+    introText.textContent = 'Review, update, and save.';
 
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         hydrateFamily(parsed, { fromCache: true });
-        setBanner('info', 'Showing the most recent details saved on this device…');
+        setBanner('info', 'Latest saved on this device.');
       } catch (err) {
         console.warn('Unable to parse cached family data', err);
       }
     }
 
-    const message = cached ? 'Refreshing your RSVP…' : 'Loading your RSVP…';
+    const message = cached ? 'Refreshing RSVP…' : 'Loading RSVP…';
     fetchFamily({ message });
   }
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!currentFamily || !familyCode) {
-      setBanner('error', 'Please enter your invite code on the home page to begin.');
+      setBanner('error', 'Enter your invite code on the home page.');
       return;
     }
 
     const rawStatuses = collectStatuses();
     const missing = rawStatuses.find((status) => status.choice === '');
     if (missing) {
-      setBanner('error', 'Please select attending or not attending for each guest.');
+      setBanner('error', 'Select attending for each guest.');
       return;
     }
 
     const statuses = rawStatuses.map(({ name, attending }) => ({ name, attending }));
     if (!statuses.length) {
-      setBanner('error', 'We could not find any members on this invitation.');
+      setBanner('error', 'No members found.');
       return;
     }
 
@@ -448,10 +443,10 @@
     };
 
     setFormEnabled(false);
-    setBanner('checking', 'Saving your RSVP…');
+    setBanner('checking', 'Saving RSVP…');
     showDialog({
-      title: 'Saving your RSVP',
-      message: 'Please wait while we save your updates.',
+      title: 'Saving RSVP',
+      message: 'Saving updates…',
       showButton: false,
     });
 
@@ -476,20 +471,20 @@
       }
 
       if (!data.ok) {
-        setBanner('error', data.error || 'Unable to save your RSVP right now.');
+        setBanner('error', data.error || 'Unable to save right now.');
         setFormEnabled(true);
         showDialog({
           title: 'RSVP Failed',
-          message: data.error || 'We could not save your RSVP. Please try again.',
+          message: data.error || 'Save failed. Try again.',
         });
         return;
       }
 
-      setBanner('ok', 'Thank you! Your RSVP has been saved.');
+      setBanner('ok', 'RSVP saved.');
       await fetchFamily({ message: null, showDialog: false });
       showDialog({
         title: 'RSVP Saved',
-        message: 'Your RSVP has been saved successfully. Redirecting to the FAQ…',
+        message: 'RSVP saved. Redirecting to FAQ…',
         showButton: false,
       });
       if (redirectTimer) {
@@ -500,11 +495,11 @@
       }, 1600);
     } catch (err) {
       console.error(err);
-      setBanner('error', 'Submission failed. Please try again.');
+      setBanner('error', 'Save failed. Try again.');
       setFormEnabled(true);
       showDialog({
         title: 'RSVP Failed',
-        message: 'We could not save your RSVP. Please try again.',
+        message: 'Save failed. Try again.',
         onConfirm: () => {},
       });
     }
