@@ -223,7 +223,8 @@
 
   function showFamily(f) {
     famBox.classList.remove('is-hidden');
-    famTitle.textContent = `Hello!`;
+    famTitle.textContent = '';
+    famTitle.classList.add('is-hidden');
     const members = Array.isArray(f.members) ? f.members : [];
     famCount.textContent = `Members on this invitation: ${members.length}`;
     famMembers.textContent = members.join(', ');
@@ -233,6 +234,7 @@
   function hideFamily() {
     famBox.classList.add('is-hidden');
     famTitle.textContent = '';
+    famTitle.classList.add('is-hidden');
     famCount.textContent = '';
     famMembers.textContent = '';
     famCode.textContent = '';
@@ -340,9 +342,17 @@
   async function fetchFamily(options = {}) {
     if (!familyCode) return;
     const message = Object.prototype.hasOwnProperty.call(options, 'message') ? options.message : 'Loading your RSVP…';
+    const shouldShowDialog = Object.prototype.hasOwnProperty.call(options, 'showDialog') ? options.showDialog : true;
     setFormEnabled(false);
     if (message !== null) {
       setBanner('checking', message || 'Loading your RSVP…');
+    }
+    if (shouldShowDialog) {
+      showDialog({
+        title: 'Refreshing RSVP',
+        message: message || 'Refreshing your RSVP…',
+        showButton: false,
+      });
     }
 
     try {
@@ -365,6 +375,10 @@
       console.error(err);
       setBanner('error', 'Something went wrong while loading. Please try again.');
       setFormEnabled(true);
+    } finally {
+      if (shouldShowDialog) {
+        hideDialog();
+      }
     }
   }
 
@@ -472,7 +486,7 @@
       }
 
       setBanner('ok', 'Thank you! Your RSVP has been saved.');
-      await fetchFamily({ message: null });
+      await fetchFamily({ message: null, showDialog: false });
       showDialog({
         title: 'RSVP Saved',
         message: 'Your RSVP has been saved successfully. Redirecting to the FAQ…',
