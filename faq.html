@@ -193,6 +193,20 @@
       gap: 0.75rem;
     }
 
+    .map-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .map-divider {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      color: rgba(94, 82, 75, 0.7);
+      line-height: 1;
+    }
+
     .map-label {
       font-family: 'Libre Baskerville', serif;
       font-weight: 600;
@@ -216,6 +230,12 @@
       border: 2px solid rgba(255, 255, 255, 0.8);
       box-shadow: 0 6px 16px rgba(94, 82, 75, 0.18);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .map-action img {
+      width: 28px;
+      height: 28px;
+      display: block;
     }
 
     .map-action:hover {
@@ -295,6 +315,15 @@
         font-size: 1rem;
       }
 
+      .map-action img {
+        width: 24px;
+        height: 24px;
+      }
+
+      .map-divider {
+        font-size: 1rem;
+      }
+
       .faq-wrapper {
         padding: 2rem 1.25rem 3rem;
       }
@@ -345,12 +374,15 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 Iglesia Ni Cristo, Lokal ng Guadalupe </p>
-            <a class="map-action map-action-google" href="https://maps.app.goo.gl/iEAdPm1QQEQP5WUt9" target="_blank" rel="noopener" aria-label="Open Google Maps for Iglesia Ni Cristo, Lokal ng Guadalupe">
-              <img src="./resources/googlemaps.png" alt="Google Maps - The Enderun Tent" loading="lazy">
-            </a>
-            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.560177,121.043739&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Iglesia Ni Cristo, Lokal ng Guadalupe">
-              <img src="./resources/waze.png" alt="Waze Directions - The Enderun Tent" loading="lazy">
-            </a>            
+            <div class="map-actions" role="group" aria-label="Map links">
+              <a class="map-action map-action-google" href="https://maps.app.goo.gl/iEAdPm1QQEQP5WUt9" target="_blank" rel="noopener" aria-label="Open Google Maps for Iglesia Ni Cristo, Lokal ng Guadalupe">
+                <img src="./resources/googlemaps.png" alt="Google Maps - The Enderun Tent" loading="lazy">
+              </a>
+              <span class="map-divider" aria-hidden="true">|</span>
+              <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.560177,121.043739&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Iglesia Ni Cristo, Lokal ng Guadalupe">
+                <img src="./resources/waze.png" alt="Waze Directions - The Enderun Tent" loading="lazy">
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -367,12 +399,15 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 The Enderun Tent</p>
-            <a class="map-action map-action-google" href="https://maps.app.goo.gl/ySRwzqxDePwYyuSf7" target="_blank" rel="noopener" aria-label="Open Google Maps for The Enderun Tent">
-              <img src="./resources/googlemaps.png" alt="Google Maps - The Enderun Tent" loading="lazy">
-            </a>
-            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532709,121.053330&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for The Enderun Tent">
-              <img src="./resources/waze.png" alt="Waze Directions - The Enderun Tent" loading="lazy">
-            </a>
+            <div class="map-actions" role="group" aria-label="Map links">
+              <a class="map-action map-action-google" href="https://maps.app.goo.gl/ySRwzqxDePwYyuSf7" target="_blank" rel="noopener" aria-label="Open Google Maps for The Enderun Tent">
+                <img src="./resources/googlemaps.png" alt="Google Maps - The Enderun Tent" loading="lazy">
+              </a>
+              <span class="map-divider" aria-hidden="true">|</span>
+              <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532709,121.053330&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for The Enderun Tent">
+                <img src="./resources/waze.png" alt="Waze Directions - The Enderun Tent" loading="lazy">
+              </a>
+            </div>
           </div>
         </div>
 
@@ -384,12 +419,15 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍Venice Grand Canal Mall Basement Parking</p>
-            <a class="map-action map-action-google" href="https://maps.app.goo.gl/KCyV3TxCeTVH8MCT8" target="_blank" rel="noopener" aria-label="Open Google Maps for Venice Grand Canal Mall Basement Parking">
-              <img src="./resources/googlemaps.png" alt="Google Maps - Venice Grand Canal Mall Basement Parking" loading="lazy">
-            </a>
-            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532597,121.051755&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Venice Grand Canal Mall Basement Parking">
-              <img src="./resources/waze.png" alt="Waze Directions - Venice Grand Canal Mall Basement Parking" loading="lazy">
-            </a>
+            <div class="map-actions" role="group" aria-label="Map links">
+              <a class="map-action map-action-google" href="https://maps.app.goo.gl/KCyV3TxCeTVH8MCT8" target="_blank" rel="noopener" aria-label="Open Google Maps for Venice Grand Canal Mall Basement Parking">
+                <img src="./resources/googlemaps.png" alt="Google Maps - Venice Grand Canal Mall Basement Parking" loading="lazy">
+              </a>
+              <span class="map-divider" aria-hidden="true">|</span>
+              <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532597,121.051755&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Venice Grand Canal Mall Basement Parking">
+                <img src="./resources/waze.png" alt="Waze Directions - Venice Grand Canal Mall Basement Parking" loading="lazy">
+              </a>
+            </div>
           </div>
       </div>
       </div>
