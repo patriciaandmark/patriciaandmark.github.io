@@ -183,27 +183,52 @@
       max-width: 700px;
       margin-left: auto;
       margin-right: auto;
+      display: grid;
+      gap: 1.25rem;
     }
 
     .map-frame {
-      margin-bottom: 2rem;
+      display: grid;
+      justify-items: center;
+      gap: 0.75rem;
     }
 
     .map-label {
       font-family: 'Libre Baskerville', serif;
       font-weight: 600;
       color: #5e524b;
-      margin-bottom: 0.75rem;
+      margin: 0;
       font-size: 1rem;
     }
 
-    .map-embed {
-      border: 1px solid #d8c3b4;
-      border-radius: 8px;
-      width: 100%;
-      height: 400px;
-      display: block;
-      box-shadow: 0 2px 6px rgba(216, 195, 180, 0.25);
+    .map-action {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 16px rgba(94, 82, 75, 0.18);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .map-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(94, 82, 75, 0.2);
+    }
+
+    .map-action-google {
+      background: #1a73e8;
+    }
+
+    .map-action-waze {
+      background: #2bb7ff;
     }
 
     .gift-grid {
@@ -264,8 +289,10 @@
     }
 
     @media (max-width: 768px) {
-      .map-embed {
-        height: 300px;
+      .map-action {
+        width: 56px;
+        height: 56px;
+        font-size: 1rem;
       }
 
       .faq-wrapper {
@@ -318,24 +345,16 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 Google Maps - Iglesia Ni Cristo, Lokal ng Guadalupe </p>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6561.841943781868!2d121.04126107684452!3d14.5601861780613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c857e1d4aeb1%3A0xe27fbc1e63d58f00!2sIglesia%20Ni%20Cristo%20%5BMakati%5D%20-%20Guadalupe!5e1!3m2!1sen!2sph!4v1762075749980!5m2!1sen!2sph"
-              class="map-embed"
-              allowfullscreen
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Google Maps view of Iglesia Ni Cristo, Lokal ng Guadalupe">
-            </iframe>
+            <a class="map-action map-action-google" href="https://www.google.com/maps/search/?api=1&query=14.5601861780613,121.04126107684452" target="_blank" rel="noopener" aria-label="Open Google Maps for Iglesia Ni Cristo, Lokal ng Guadalupe">
+              G
+            </a>
           </div>
         
           <div class="map-frame">
             <p class="map-label">🗺️ Waze Directions - Iglesia Ni Cristo, Lokal ng Guadalupe</p>
-            <iframe
-              src="https://embed.waze.com/iframe?zoom=16&lat=14.560177&lon=121.043739&ct=livemap"
-              class="map-embed"
-              allowfullscreen
-              title="Waze map for Iglesia Ni Cristo, Lokal ng Guadalupe">
-            </iframe>
+            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.560177,121.043739&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Iglesia Ni Cristo, Lokal ng Guadalupe">
+              W
+            </a>
           </div>
         </div>
       </div>
@@ -352,25 +371,18 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 Google Maps - The Enderun Tent</p>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3281.323788261166!2d121.05252896000894!3d14.533078443467227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c95f747c2e0f%3A0xc05ca189132ebd4b!2sEnderun%20Events!5e1!3m2!1sen!2sph!4v1762078825757!5m2!1sen!2sph"
-              class="map-embed"
-              allowfullscreen
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Google Maps view of The Enderun Tent">
-            </iframe>
+            <a class="map-action map-action-google" href="https://www.google.com/maps/search/?api=1&query=14.533078443467227,121.05252896000894" target="_blank" rel="noopener" aria-label="Open Google Maps for The Enderun Tent">
+              G
+            </a>
           </div>
         
           <div class="map-frame">
             <p class="map-label">🗺️ Waze Directions - The Enderun Tent</p>
-            <iframe
-              src="https://embed.waze.com/iframe?zoom=16&lat=14.532709&lon=121.053330&ct=livemap"
-              class="map-embed"
-              allowfullscreen
-              title="Waze map for The Enderun Tent">
-            </iframe>
+            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532709,121.053330&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for The Enderun Tent">
+              W
+            </a>
           </div>
+        </div>
 
         <div class="venue-card" role="group" aria-label="Reception details">
           <strong>Venice Grand Canal Mall Parking</strong>
@@ -381,25 +393,18 @@
         <div class="map-container">
           <div class="map-frame">
             <p class="map-label">📍 Google Maps - Venice Grand Canal Mall Basement Parking</p>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3281.3308914946915!2d121.04931964998428!3d14.532599983823381!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c90065be90b7%3A0xa53c25a813fbd73c!2sVenice%20Grand%20Canal%20Mall%20Basement%20Parking!5e1!3m2!1sen!2sph!4v1762079219929!5m2!1sen!2sph"
-              class="map-embed"
-              allowfullscreen
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Google Maps view of Venice Grand Canal Basement Mall Parking">
-            </iframe>
+            <a class="map-action map-action-google" href="https://www.google.com/maps/search/?api=1&query=14.532599983823381,121.04931964998428" target="_blank" rel="noopener" aria-label="Open Google Maps for Venice Grand Canal Mall Basement Parking">
+              G
+            </a>
           </div>
 
           <div class="map-frame">
             <p class="map-label">🗺️ Waze Directions - Venice Grand Canal Mall Basement Parking</p>
-            <iframe
-              src="https://embed.waze.com/iframe?zoom=16&lat=14.532597&lon=121.051755&ct=livemap"
-              class="map-embed"
-              allowfullscreen
-              title="Waze map for Venice Grand Canal Mall Basement Parking">
-            </iframe>
+            <a class="map-action map-action-waze" href="https://waze.com/ul?ll=14.532597,121.051755&navigate=yes" target="_blank" rel="noopener" aria-label="Open Waze for Venice Grand Canal Mall Basement Parking">
+              W
+            </a>
           </div>
+      </div>
       </div>
     </details>
 
