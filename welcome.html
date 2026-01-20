@@ -25,15 +25,66 @@
 
   p {
     font-family: var(--font-body);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     color: var(--color-text);
     letter-spacing: 0.03em;
   }
 
   .countdown {
-    font-size: 1.25rem;
     margin-top: 2rem;
     color: var(--color-text);
+    display: inline-flex;
+    gap: 1rem;
+    padding: 1.25rem 1.75rem;
+    background: linear-gradient(135deg, #f8f1e9 0%, #f1e6db 100%);
+    border: 2px solid rgba(216, 195, 180, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(94, 82, 75, 0.12);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .countdown::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.35) 0,
+      rgba(255, 255, 255, 0.35) 6px,
+      rgba(255, 255, 255, 0.15) 6px,
+      rgba(255, 255, 255, 0.15) 12px
+    );
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .countdown-block {
+    position: relative;
+    z-index: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 12px;
+    border: 1px solid rgba(216, 195, 180, 0.6);
+  }
+
+  .countdown-value {
+    display: block;
+    font-size: 1.8rem;
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .countdown-label {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--color-text);
+    letter-spacing: 0.12em;
   }
 
   .rsvp-status {
@@ -67,6 +118,31 @@
     transform: translateY(-1px);
   }
 
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+
+    .countdown {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .countdown-block {
+      min-width: auto;
+    }
+
+    .countdown-value {
+      font-size: 1.4rem;
+    }
+  }
+
   .is-hidden { display: none; }
 </style>
 
@@ -75,7 +151,20 @@
 <h1>Welcome!</h1>
 <p>Patricia &amp; Mark — June 8, 2026</p>
 
-<div id="countdown" class="countdown">Loading countdown...</div>
+<div id="countdown" class="countdown" aria-live="polite">
+  <div class="countdown-block">
+    <span class="countdown-value" data-unit="days">--</span>
+    <span class="countdown-label">Days</span>
+  </div>
+  <div class="countdown-block">
+    <span class="countdown-value" data-unit="hours">--</span>
+    <span class="countdown-label">Hours</span>
+  </div>
+  <div class="countdown-block">
+    <span class="countdown-value" data-unit="minutes">--</span>
+    <span class="countdown-label">Minutes</span>
+  </div>
+</div>
 <div id="rsvp-status" class="rsvp-status is-hidden">
   <p id="rsvp-status-message"></p>
   <button id="rsvp-status-button" type="button">Go to RSVP</button>
@@ -102,8 +191,12 @@
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      countdownElement.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs to go 💍`;
+      const dayEl = countdownElement.querySelector('[data-unit="days"]');
+      const hourEl = countdownElement.querySelector('[data-unit="hours"]');
+      const minuteEl = countdownElement.querySelector('[data-unit="minutes"]');
+      if (dayEl) dayEl.textContent = String(days).padStart(2, '0');
+      if (hourEl) hourEl.textContent = String(hours).padStart(2, '0');
+      if (minuteEl) minuteEl.textContent = String(minutes).padStart(2, '0');
     }
 
     setInterval(updateCountdown, 1000);
