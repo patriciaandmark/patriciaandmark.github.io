@@ -29,6 +29,8 @@
       color: var(--color-text);
       margin: 0;
       text-align: center;
+      position: relative;
+      overflow-x: hidden;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -101,6 +103,41 @@
     }
     #page-content.loaded {
       opacity: 1;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.7), transparent 55%),
+        radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.5), transparent 60%);
+      opacity: 0.4;
+      pointer-events: none;
+      animation: glow-drift 18s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    nav,
+    #page-content,
+    footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes glow-drift {
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0);
+      }
+      50% {
+        transform: translate3d(0, 12px, 0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::before {
+        animation: none;
+      }
     }
   </style>
 </head>
