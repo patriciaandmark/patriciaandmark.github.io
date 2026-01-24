@@ -20,16 +20,18 @@
     font-family: var(--font-heading);
     color: var(--color-heading);
     text-transform: none;
-    font-size: 2rem;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
     font-weight: 700;
     letter-spacing: 0.02em;
+    margin: 0.35rem 0;
   }
 
   p {
     font-family: var(--font-body);
-    font-size: 1.75rem;
+    font-size: clamp(0.98rem, 2.4vw, 1.2rem);
     color: var(--color-text);
     letter-spacing: 0.03em;
+    margin: 0.35rem 0;
   }
 
   .invite-line {
@@ -126,12 +128,14 @@
 
   @media (max-width: 600px) {
     h1 {
-      font-size: 2rem;
+      font-size: 1.35rem;
       text-transform: none;
+      line-height: 1.25;
     }
 
     p {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
     }
 
     .ampersand {
