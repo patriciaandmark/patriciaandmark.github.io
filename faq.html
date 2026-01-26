@@ -287,6 +287,30 @@
       gap: 1rem;
     }
 
+    .schedule-card {
+      display: grid;
+      gap: 0.35rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 16px;
+      border: 1px solid var(--color-outline);
+    }
+
+    .schedule-time {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      color: var(--color-heading);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .schedule-event {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
     .hashtags {
       display: flex;
       flex-wrap: wrap;
@@ -502,10 +526,26 @@
       <div class="faq-answer">
         Here's a little peek at how the day will flow — final details will be shared closer to the date.
         <div class="schedule-grid">
-          <figure>
-            <img src="./resources/timeline.png" alt="Timeline with ceremony prelude, exchange of vows, and reception highlights." loading="lazy">
-            <figcaption>Pin this guide and get excited for every moment.</figcaption>
-          </figure>
+          <div class="schedule-card">
+            <span class="schedule-time">3PM</span>
+            <span class="schedule-event">CEREMONY</span>
+          </div>
+          <div class="schedule-card">
+            <span class="schedule-time">4:30PM</span>
+            <span class="schedule-event">REGISTRATION &amp; COCKTAILS</span>
+          </div>
+          <div class="schedule-card">
+            <span class="schedule-time">5:30PM</span>
+            <span class="schedule-event">RECEPTION</span>
+          </div>
+          <div class="schedule-card">
+            <span class="schedule-time">6:30PM</span>
+            <span class="schedule-event">DINNER</span>
+          </div>
+          <div class="schedule-card">
+            <span class="schedule-time">9:00PM</span>
+            <span class="schedule-event">END OF PROGRAM</span>
+          </div>
         </div>
       </div>
     </details>
