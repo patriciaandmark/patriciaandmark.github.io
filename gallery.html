@@ -4,6 +4,9 @@
     --font-body: 'Libre Baskerville', serif;
     --color-heading: #5e524b;
     --color-text: #8c7a72;
+    --color-accent: #d8c3b4;
+    --color-card: #ffffff;
+    --color-line: rgba(94, 82, 75, 0.12);
   }
 
   h2 {
@@ -11,7 +14,7 @@
     color: var(--color-heading);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   p {
@@ -19,7 +22,150 @@
     color: var(--color-text);
     line-height: 1.7;
     letter-spacing: 0.03em;
+    margin: 0.4rem 0 0;
+  }
+
+  .gallery-intro {
+    max-width: 720px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .gallery-section {
+    max-width: 980px;
+    margin: 0 auto 3rem;
+    text-align: left;
+  }
+
+  .gallery-section h3 {
+    font-family: var(--font-heading);
+    color: var(--color-heading);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-line);
+    padding-bottom: 0.65rem;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(94, 82, 75, 0.08);
+  }
+
+  .gallery-photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(216, 195, 180, 0.35), rgba(249, 244, 240, 0.9));
+    border: 1px dashed rgba(94, 82, 75, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-heading);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .gallery-name {
+    margin-top: 0.9rem;
+    font-family: var(--font-heading);
+    color: var(--color-heading);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .gallery-role {
+    font-size: 0.85rem;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .gallery-section {
+      text-align: center;
+    }
+
+    .gallery-section h3 {
+      text-align: center;
+    }
   }
 </style>
 
-<h2>Venue &amp; Vibes</h2><p>Gallery goes here 🌸</p>
+<h2>Gallery</h2>
+<p class="gallery-intro">
+  A minimalist preview of the people we love. Each frame will soon hold a real photo, with names and surnames
+  to celebrate every part of our family and entourage.
+</p>
+
+<section class="gallery-section">
+  <h3>Family Moments</h3>
+  <div class="gallery-grid">
+    <div class="gallery-card">
+      <div class="gallery-photo">Family Photo</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Family of the Bride</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Family Photo</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Family of the Groom</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Family Photo</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Parents</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Family Photo</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Siblings</p>
+    </div>
+  </div>
+</section>
+
+<section class="gallery-section">
+  <h3>Entourage Portraits</h3>
+  <div class="gallery-grid">
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Maid of Honor</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Best Man</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Bridesmaid</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Groomsman</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Flower Girl</p>
+    </div>
+    <div class="gallery-card">
+      <div class="gallery-photo">Portrait</div>
+      <div class="gallery-name">Name &amp; Surname</div>
+      <p class="gallery-role">Ring Bearer</p>
+    </div>
+  </div>
+</section>
