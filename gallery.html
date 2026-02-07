@@ -53,6 +53,10 @@
     gap: 1.5rem;
   }
 
+  .gallery-grid--family {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+  }
+
   .gallery-card {
     background: var(--color-card);
     border: 1px solid var(--color-line);
@@ -66,6 +70,7 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     border-radius: 12px;
+    overflow: hidden;
     background: linear-gradient(145deg, rgba(216, 195, 180, 0.35), rgba(249, 244, 240, 0.9));
     border: 1px dashed rgba(94, 82, 75, 0.2);
     display: flex;
@@ -75,6 +80,18 @@
     font-size: 0.85rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+  }
+
+  .gallery-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .gallery-card--family .gallery-photo {
+    aspect-ratio: 4 / 5;
+    max-height: 420px;
   }
 
   .gallery-card--portrait .gallery-photo {
@@ -98,6 +115,44 @@
     color: var(--color-text);
   }
 
+  .gallery-notice {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    padding: 1.3rem 1.6rem;
+    border: 1px solid var(--color-line);
+    border-radius: 16px;
+    background: linear-gradient(120deg, rgba(216, 195, 180, 0.2), rgba(249, 244, 240, 0.85));
+    box-shadow: 0 10px 22px rgba(94, 82, 75, 0.08);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-notice::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(216, 195, 180, 0.35), transparent 55%);
+    opacity: 0.8;
+  }
+
+  .gallery-notice * {
+    position: relative;
+  }
+
+  .gallery-notice h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-heading);
+  }
+
+  .gallery-notice p {
+    margin-top: 0.55rem;
+    font-size: 0.95rem;
+  }
+
   @media (max-width: 640px) {
     .gallery-section {
       text-align: center;
@@ -106,33 +161,41 @@
     .gallery-section h3 {
       text-align: center;
     }
+
+    .gallery-grid--family {
+      grid-template-columns: 1fr;
+    }
+
+    .gallery-card--family .gallery-photo {
+      aspect-ratio: 3 / 4;
+      max-height: 60vh;
+    }
   }
 </style>
 
 <h2>Gallery</h2>
 
+<div class="gallery-notice" role="status" aria-live="polite">
+  <h3>Page Work In Progress</h3>
+  <p>We are curating this gallery with more portraits. Please check back soon.</p>
+</div>
+
 <section class="gallery-section">
-  <h3>Entourage</h3>
-  <div class="gallery-grid">
-    <div class="gallery-card">
-      <div class="gallery-photo">Family Photo</div>
-      <div class="gallery-name">Name &amp; Surname</div>
+  <h3>Families</h3>
+  <div class="gallery-grid gallery-grid--family">
+    <div class="gallery-card gallery-card--family">
+      <div class="gallery-photo">
+        <img src="resources/demesa.jfif" alt="De Mesa family portrait">
+      </div>
+      <div class="gallery-name">De Mesa Family</div>
       <p class="gallery-role">Family of the Bride</p>
     </div>
-    <div class="gallery-card">
-      <div class="gallery-photo">Family Photo</div>
-      <div class="gallery-name">Name &amp; Surname</div>
+    <div class="gallery-card gallery-card--family">
+      <div class="gallery-photo">
+        <img src="resources/samonte.jfif" alt="Samonte family portrait">
+      </div>
+      <div class="gallery-name">Samonte Family</div>
       <p class="gallery-role">Family of the Groom</p>
-    </div>
-    <div class="gallery-card">
-      <div class="gallery-photo">Family Photo</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Parents</p>
-    </div>
-    <div class="gallery-card">
-      <div class="gallery-photo">Family Photo</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Siblings</p>
     </div>
   </div>
 </section>
