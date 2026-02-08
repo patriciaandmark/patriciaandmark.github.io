@@ -172,15 +172,21 @@
     }
 
     .gallery-grid--family {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .gallery-card--family {
+      padding: 0.65rem;
     }
 
     .gallery-card--family .gallery-photo {
       aspect-ratio: auto;
+      padding: 0.3rem;
     }
 
     .gallery-card--family .gallery-photo img {
-      max-height: 60vh;
+      max-height: 40vh;
     }
   }
 </style>
