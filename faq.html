@@ -326,6 +326,15 @@
       font-family: 'Libre Baskerville', serif;
     }
 
+    .dress-code-copy {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .dress-code-line {
+      display: inline;
+    }
+
     @media (max-width: 768px) {
       .map-action {
         font-size: 1rem;
@@ -358,6 +367,10 @@
       .faq-answer {
         padding: 1.25rem 1.4rem 1.75rem;
         font-size: 1rem;
+      }
+
+      .dress-code-line {
+        display: block;
       }
 
       .qr-stack img {
@@ -451,15 +464,13 @@
     <details class="faq-item">
       <summary class="faq-question"><span>What should we wear?</span><span class="faq-question-icon">➤</span></summary>
       <div class="faq-answer">
-        Dressy and dreamy formal or semi formal wear in <strong>soft earthy tones</strong>.
-
-        Ladies: Long gowns, cocktail dresses or dressy pantsuits
-
-        Gentlemen: Suit & tie, or long-sleeved shirt with slacks
-              
-        For gentlemen: Black suits/coats are welcome—please follow the wedding color palette for your long sleeves or tie.
-              
-        Thank you for dressing up with us 🤍
+        <div class="dress-code-copy" aria-label="Dress code details">
+          <span class="dress-code-line">Dressy and dreamy formal or semi formal wear in <strong>soft earthy tones</strong>.</span>
+          <span class="dress-code-line">Ladies: Long gowns, cocktail dresses or dressy pantsuits.</span>
+          <span class="dress-code-line">Gentlemen: Suit & tie, or long-sleeved shirt with slacks.</span>
+          <span class="dress-code-line">For gentlemen: Black suits/coats are welcome&mdash;please follow the wedding color palette for your long sleeves or tie.</span>
+          <span class="dress-code-line">Thank you for dressing up with us 🤍</span>
+        </div>
         <figure>
           <picture>
             <source srcset="./resources/dress-code-palette.png" type="image/svg+xml">
