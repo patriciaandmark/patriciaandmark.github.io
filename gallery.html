@@ -53,6 +53,55 @@
     gap: 1.5rem;
   }
 
+  .entourage-block {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .entourage-row-title {
+    margin: 0 0 0.85rem;
+    font-family: var(--font-heading);
+    color: var(--color-heading);
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .entourage-row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(88px, 1fr);
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.35rem 0.1rem 0.55rem;
+    scrollbar-width: thin;
+  }
+
+  .entourage-row .gallery-card--portrait {
+    padding: 0.65rem 0.5rem 0.7rem;
+    min-width: 88px;
+  }
+
+  .entourage-row .gallery-card--portrait .gallery-photo {
+    width: 100%;
+    max-width: 90px;
+    aspect-ratio: 1 / 1;
+  }
+
+  .entourage-row .gallery-name {
+    margin-top: 0.55rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+    text-transform: uppercase;
+  }
+
+  .entourage-row .gallery-role {
+    margin-top: 0.3rem;
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
   .gallery-grid--family {
     grid-template-columns: repeat(2, minmax(240px, 1fr));
   }
@@ -188,6 +237,30 @@
     .gallery-card--family .gallery-photo img {
       max-height: 40vh;
     }
+
+    .entourage-row {
+      grid-auto-columns: minmax(78px, 1fr);
+      gap: 0.55rem;
+      padding-bottom: 0.65rem;
+    }
+
+    .entourage-row .gallery-card--portrait {
+      min-width: 78px;
+      padding: 0.45rem 0.35rem 0.55rem;
+    }
+
+    .entourage-row .gallery-card--portrait .gallery-photo {
+      max-width: 74px;
+    }
+
+    .entourage-row .gallery-name {
+      font-size: 0.62rem;
+      letter-spacing: 0.04em;
+    }
+
+    .entourage-row .gallery-role {
+      font-size: 0.6rem;
+    }
   }
 </style>
 
@@ -220,36 +293,102 @@
 
 <section class="gallery-section">
   <h3>Entourage Portraits</h3>
-  <div class="gallery-grid">
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Maid of Honor</p>
+  <div class="entourage-block">
+    <div>
+      <p class="entourage-row-title">Bride's Entourage</p>
+      <div class="entourage-row">
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/rin.jpg" alt="Rin - Maid of Honor" loading="lazy"></div>
+          <div class="gallery-name">Rin</div>
+          <p class="gallery-role">Maid of Honor</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/margaux.jpg" alt="Margaux - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Margaux</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/demi.jpg" alt="Demi - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Demi</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/pam.jpg" alt="Pam - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Pam</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/mhon.jpg" alt="Mhon - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Mhon</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/beneth.jpg" alt="Beneth - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Beneth</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/dustine.jpg" alt="Dustine - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Dustine</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/noreen.jpg" alt="Noreen - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Noreen</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/airiz.jpg" alt="Airiz - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Airiz</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/vida.jpg" alt="Vida - Bridesmaid" loading="lazy"></div>
+          <div class="gallery-name">Vida</div>
+          <p class="gallery-role">Bridesmaid</p>
+        </div>
+      </div>
     </div>
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Best Man</p>
-    </div>
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Bridesmaid</p>
-    </div>
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Groomsman</p>
-    </div>
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Flower Girl</p>
-    </div>
-    <div class="gallery-card gallery-card--portrait">
-      <div class="gallery-photo">Portrait</div>
-      <div class="gallery-name">Name &amp; Surname</div>
-      <p class="gallery-role">Ring Bearer</p>
+
+    <div>
+      <p class="entourage-row-title">Groom's Entourage</p>
+      <div class="entourage-row">
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/al.jpg" alt="Al - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Al</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/val.jpg" alt="Val - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Val</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/vince.jpg" alt="Vince - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Vince</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/neth.jpg" alt="Neth - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Neth</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/jed.jpg" alt="Jed - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Jed</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/luis.jpg" alt="Luis - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Luis</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+        <div class="gallery-card gallery-card--portrait">
+          <div class="gallery-photo"><img src="resources/hepri.jpg" alt="Hepri - Groomsman" loading="lazy"></div>
+          <div class="gallery-name">Hepri</div>
+          <p class="gallery-role">Groomsman</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
