@@ -70,22 +70,23 @@
   .entourage-row {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(88px, 1fr);
-    gap: 0.75rem;
+    grid-auto-columns: minmax(128px, 1fr);
+    gap: 1rem;
     overflow-x: auto;
     padding: 0.35rem 0.1rem 0.55rem;
     scrollbar-width: thin;
   }
 
   .entourage-row .gallery-card--portrait {
-    padding: 0.65rem 0.5rem 0.7rem;
-    min-width: 88px;
+    padding: 0.75rem 0.6rem 0.8rem;
+    min-width: 128px;
   }
 
   .entourage-row .gallery-card--portrait .gallery-photo {
     width: 100%;
-    max-width: 90px;
+    max-width: 120px;
     aspect-ratio: 1 / 1;
+    border-radius: 12px;
   }
 
   .entourage-row .gallery-name {
@@ -239,18 +240,18 @@
     }
 
     .entourage-row {
-      grid-auto-columns: minmax(78px, 1fr);
-      gap: 0.55rem;
+      grid-auto-columns: minmax(108px, 1fr);
+      gap: 0.7rem;
       padding-bottom: 0.65rem;
     }
 
     .entourage-row .gallery-card--portrait {
-      min-width: 78px;
-      padding: 0.45rem 0.35rem 0.55rem;
+      min-width: 108px;
+      padding: 0.6rem 0.45rem 0.65rem;
     }
 
     .entourage-row .gallery-card--portrait .gallery-photo {
-      max-width: 74px;
+      max-width: 98px;
     }
 
     .entourage-row .gallery-name {
