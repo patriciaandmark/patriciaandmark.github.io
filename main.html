@@ -146,7 +146,11 @@
 
     const DEFAULT_ROUTE = 'welcome';
     let currentRouteKey = null;
-    const VISIT_COUNTER_URL = 'https://api.countapi.xyz/hit/patriciaandmark.github.io/site-visits';
+    const VISIT_COUNTER_URLS = [
+      'https://api.countapi.xyz/hit/patriciaandmark.github.io/site-visits',
+      'https://countapi.xyz/hit/patriciaandmark.github.io/site-visits'
+    ];
+    const LOCAL_VISIT_KEY = 'patriciaandmark-local-site-visits';
 
     function getRoute(identifier) {
       if (identifier === null || identifier === undefined) return null;
@@ -272,21 +276,43 @@
       updateVisitCount();
     });
 
+    async function fetchCloudVisitCount() {
+      for (const url of VISIT_COUNTER_URLS) {
+        try {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const payload = await response.json();
+          const count = Number(payload && payload.value);
+          if (!Number.isFinite(count)) throw new Error('Invalid count payload');
+          return count;
+        } catch (error) {
+          console.warn(`Visit counter failed for ${url}`, error);
+        }
+      }
+
+      return null;
+    }
+
+    function updateLocalVisitFallback() {
+      const raw = localStorage.getItem(LOCAL_VISIT_KEY);
+      const previousCount = Number(raw);
+      const count = Number.isFinite(previousCount) ? previousCount + 1 : 1;
+      localStorage.setItem(LOCAL_VISIT_KEY, String(count));
+      return count;
+    }
+
     async function updateVisitCount() {
       const visitCountElement = document.getElementById('visit-count');
       if (!visitCountElement) return;
 
-      try {
-        const response = await fetch(VISIT_COUNTER_URL);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json();
-        const count = Number(payload && payload.value);
-        if (!Number.isFinite(count)) throw new Error('Invalid count payload');
-        visitCountElement.textContent = `Site visits: ${count.toLocaleString()}`;
-      } catch (error) {
-        console.error('Failed to load visit count', error);
-        visitCountElement.textContent = 'Site visits unavailable right now.';
+      const cloudCount = await fetchCloudVisitCount();
+      if (Number.isFinite(cloudCount)) {
+        visitCountElement.textContent = `Site visits: ${cloudCount.toLocaleString()}`;
+        return;
       }
+
+      const localCount = updateLocalVisitFallback();
+      visitCountElement.textContent = `Visits on this device: ${localCount.toLocaleString()}`;
     }
   </script>
 </body>
