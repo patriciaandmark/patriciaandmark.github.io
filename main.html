@@ -150,7 +150,7 @@
       'https://api.countapi.xyz/hit/patriciaandmark.github.io/site-visits',
       'https://countapi.xyz/hit/patriciaandmark.github.io/site-visits'
     ];
-    const LOCAL_VISIT_KEY = 'patriciaandmark-local-site-visits';
+    const LAST_KNOWN_SITE_VISIT_KEY = 'patriciaandmark-last-known-site-visits';
 
     function getRoute(identifier) {
       if (identifier === null || identifier === undefined) return null;
@@ -293,12 +293,10 @@
       return null;
     }
 
-    function updateLocalVisitFallback() {
-      const raw = localStorage.getItem(LOCAL_VISIT_KEY);
-      const previousCount = Number(raw);
-      const count = Number.isFinite(previousCount) ? previousCount + 1 : 1;
-      localStorage.setItem(LOCAL_VISIT_KEY, String(count));
-      return count;
+    function readLastKnownSiteVisitCount() {
+      const raw = localStorage.getItem(LAST_KNOWN_SITE_VISIT_KEY);
+      const count = Number(raw);
+      return Number.isFinite(count) ? count : null;
     }
 
     async function updateVisitCount() {
@@ -307,12 +305,18 @@
 
       const cloudCount = await fetchCloudVisitCount();
       if (Number.isFinite(cloudCount)) {
+        localStorage.setItem(LAST_KNOWN_SITE_VISIT_KEY, String(cloudCount));
         visitCountElement.textContent = `Site visits: ${cloudCount.toLocaleString()}`;
         return;
       }
 
-      const localCount = updateLocalVisitFallback();
-      visitCountElement.textContent = `Visits on this device: ${localCount.toLocaleString()}`;
+      const lastKnownCount = readLastKnownSiteVisitCount();
+      if (Number.isFinite(lastKnownCount)) {
+        visitCountElement.textContent = `Site visits: ${lastKnownCount.toLocaleString()} (last synced)`;
+        return;
+      }
+
+      visitCountElement.textContent = 'Site visits are temporarily unavailable.';
     }
   </script>
 </body>
