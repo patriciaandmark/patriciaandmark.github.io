@@ -87,6 +87,11 @@
     footer .footer-note {
       font-size: 0.75rem;
     }
+    footer .visit-count {
+      font-size: 0.78rem;
+      color: var(--color-muted);
+      min-height: 1rem;
+    }
     footer iframe {
       width: 100%;
       height: 152px;
@@ -126,6 +131,7 @@
         allowtransparency="true"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       ></iframe>
+      <p class="visit-count" id="visit-count" aria-live="polite">Loading visit count…</p>
     </div>
   </footer>
 
@@ -140,6 +146,7 @@
 
     const DEFAULT_ROUTE = 'welcome';
     let currentRouteKey = null;
+    const VISIT_COUNTER_URL = 'https://api.countapi.xyz/hit/patriciaandmark.github.io/site-visits';
 
     function getRoute(identifier) {
       if (identifier === null || identifier === undefined) return null;
@@ -262,7 +269,25 @@
     window.addEventListener('load', () => {
       const initial = resolveInitialRoute();
       renderRoute(initial ? initial.key : DEFAULT_ROUTE, { replace: true, force: true });
+      updateVisitCount();
     });
+
+    async function updateVisitCount() {
+      const visitCountElement = document.getElementById('visit-count');
+      if (!visitCountElement) return;
+
+      try {
+        const response = await fetch(VISIT_COUNTER_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        const count = Number(payload && payload.value);
+        if (!Number.isFinite(count)) throw new Error('Invalid count payload');
+        visitCountElement.textContent = `Site visits: ${count.toLocaleString()}`;
+      } catch (error) {
+        console.error('Failed to load visit count', error);
+        visitCountElement.textContent = 'Site visits unavailable right now.';
+      }
+    }
   </script>
 </body>
 </html>
