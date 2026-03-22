@@ -105,6 +105,13 @@
 
   .gallery-grid--family {
     grid-template-columns: repeat(2, minmax(240px, 1fr));
+    justify-content: center;
+  }
+
+  .gallery-grid--family .gallery-card--family {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
   }
 
   .gallery-card {
@@ -242,27 +249,40 @@
     }
 
     .entourage-row {
-      grid-auto-columns: minmax(108px, 1fr);
-      gap: 0.7rem;
-      padding-bottom: 0.65rem;
+      grid-auto-flow: row;
+      grid-auto-columns: unset;
+      overflow-x: visible;
+      gap: 0.55rem;
+      padding-bottom: 0.3rem;
+    }
+
+    .entourage-row--bride {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .entourage-row--groom {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .entourage-row .gallery-card--portrait {
-      min-width: 108px;
-      padding: 0.6rem 0.45rem 0.65rem;
+      min-width: 0;
+      padding: 0.5rem 0.25rem 0.55rem;
     }
 
     .entourage-row .gallery-card--portrait .gallery-photo {
-      max-width: 98px;
+      max-width: 58px;
     }
 
     .entourage-row .gallery-name {
-      font-size: 0.62rem;
+      font-size: 0.5rem;
       letter-spacing: 0.04em;
+      line-height: 1.2;
+      min-height: 2.4em;
     }
 
     .entourage-row .gallery-role {
-      font-size: 0.6rem;
+      font-size: 0.5rem;
+      line-height: 1.1;
     }
   }
 </style>
@@ -299,7 +319,7 @@
   <div class="entourage-block">
     <div>
       <p class="entourage-row-title">Bride's Entourage</p>
-      <div class="entourage-row">
+      <div class="entourage-row entourage-row--bride">
         <div class="gallery-card gallery-card--portrait">
           <div class="gallery-photo"><img src="resources/rin.jpg" alt="Rin - Maid of Honor" loading="lazy"></div>
           <div class="gallery-name">Rin</div>
@@ -355,7 +375,7 @@
 
     <div>
       <p class="entourage-row-title">Groom's Entourage</p>
-      <div class="entourage-row">
+      <div class="entourage-row entourage-row--groom">
         <div class="gallery-card gallery-card--portrait">
           <div class="gallery-photo"><img src="resources/al.jpg" alt="Christian Al P. Medina - Groomsman" loading="lazy"></div>
           <div class="gallery-name">Christian Al P. Medina</div>
