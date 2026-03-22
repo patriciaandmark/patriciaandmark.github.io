@@ -87,11 +87,6 @@
     footer .footer-note {
       font-size: 0.75rem;
     }
-    footer .visit-count {
-      font-size: 0.78rem;
-      color: var(--color-muted);
-      min-height: 1rem;
-    }
     footer iframe {
       width: 100%;
       height: 152px;
@@ -131,7 +126,6 @@
         allowtransparency="true"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       ></iframe>
-      <p class="visit-count" id="visit-count" aria-live="polite">Loading visit count…</p>
     </div>
   </footer>
 
@@ -146,11 +140,6 @@
 
     const DEFAULT_ROUTE = 'welcome';
     let currentRouteKey = null;
-    const VISIT_COUNTER_URLS = [
-      'https://api.countapi.xyz/hit/patriciaandmark.github.io/site-visits',
-      'https://countapi.xyz/hit/patriciaandmark.github.io/site-visits'
-    ];
-    const LAST_KNOWN_SITE_VISIT_KEY = 'patriciaandmark-last-known-site-visits';
 
     function getRoute(identifier) {
       if (identifier === null || identifier === undefined) return null;
@@ -273,51 +262,7 @@
     window.addEventListener('load', () => {
       const initial = resolveInitialRoute();
       renderRoute(initial ? initial.key : DEFAULT_ROUTE, { replace: true, force: true });
-      updateVisitCount();
     });
-
-    async function fetchCloudVisitCount() {
-      for (const url of VISIT_COUNTER_URLS) {
-        try {
-          const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const payload = await response.json();
-          const count = Number(payload && payload.value);
-          if (!Number.isFinite(count)) throw new Error('Invalid count payload');
-          return count;
-        } catch (error) {
-          console.warn(`Visit counter failed for ${url}`, error);
-        }
-      }
-
-      return null;
-    }
-
-    function readLastKnownSiteVisitCount() {
-      const raw = localStorage.getItem(LAST_KNOWN_SITE_VISIT_KEY);
-      const count = Number(raw);
-      return Number.isFinite(count) ? count : null;
-    }
-
-    async function updateVisitCount() {
-      const visitCountElement = document.getElementById('visit-count');
-      if (!visitCountElement) return;
-
-      const cloudCount = await fetchCloudVisitCount();
-      if (Number.isFinite(cloudCount)) {
-        localStorage.setItem(LAST_KNOWN_SITE_VISIT_KEY, String(cloudCount));
-        visitCountElement.textContent = `Site visits: ${cloudCount.toLocaleString()}`;
-        return;
-      }
-
-      const lastKnownCount = readLastKnownSiteVisitCount();
-      if (Number.isFinite(lastKnownCount)) {
-        visitCountElement.textContent = `Site visits: ${lastKnownCount.toLocaleString()} (last synced)`;
-        return;
-      }
-
-      visitCountElement.textContent = 'Site visits are temporarily unavailable.';
-    }
   </script>
 </body>
 </html>
