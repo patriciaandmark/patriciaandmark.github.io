@@ -68,18 +68,19 @@
   }
 
   .entourage-row {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(128px, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
-    overflow-x: auto;
+    overflow-x: visible;
     padding: 0.35rem 0.1rem 0.55rem;
     scrollbar-width: thin;
   }
 
   .entourage-row .gallery-card--portrait {
     padding: 0.75rem 0.6rem 0.8rem;
-    min-width: 128px;
+    width: 128px;
+    flex: 0 0 128px;
   }
 
   .entourage-row .gallery-card--portrait .gallery-photo {
@@ -248,6 +249,7 @@
     }
 
     .entourage-row {
+      display: grid;
       grid-auto-flow: row;
       grid-auto-columns: unset;
       overflow-x: visible;
