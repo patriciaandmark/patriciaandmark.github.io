@@ -77,6 +77,33 @@
     scrollbar-width: thin;
   }
 
+  .entourage-row--groom {
+    display: grid;
+    grid-template-columns: repeat(5, 128px);
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .entourage-row--groom .gallery-card--portrait:nth-child(n + 6) {
+    grid-row: 2;
+  }
+
+  .entourage-row--groom .gallery-card--portrait:nth-child(6) {
+    grid-column: 2;
+  }
+
+  .entourage-row--groom .gallery-card--portrait:nth-child(7) {
+    grid-column: 3;
+  }
+
+  .entourage-row--groom .gallery-card--portrait:nth-child(8) {
+    grid-column: 4;
+  }
+
+  .entourage-row--groom .gallery-card--portrait:nth-child(9) {
+    grid-column: 5;
+  }
+
   .entourage-row .gallery-card--portrait {
     padding: 0.75rem 0.6rem 0.8rem;
     width: 128px;
@@ -253,6 +280,11 @@
       overflow-x: visible;
       gap: 0.55rem;
       padding-bottom: 0.3rem;
+    }
+
+    .entourage-row--groom {
+      grid-template-columns: repeat(5, 110px);
+      gap: 0.55rem;
     }
 
     .entourage-row .gallery-card--portrait {
